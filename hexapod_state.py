@@ -1,5 +1,16 @@
-from bezier import *
+from bezier import Vector2, Vector3, get_point_on_bezier_curve, map_float, constrain
 from enum import Enum
+
+
+class State(Enum):
+    INITIALIZE = 0
+    STAND = 1
+    CAR = 2
+    CRAB = 3
+    CALIBRATE = 4
+    SLAM_ATTACK = 5
+    SLEEP = 6
+    ATTACH = 7
 
 
 class LegState(Enum):
@@ -83,38 +94,110 @@ def car_state():
         for i in range(6):
             leg_states[i] = LegState.RESET
 
-        if current_gait == Gait.TRI:
-            cycle_progress[0] = 0
-            cycle_progress[1] = points / 2
-            cycle_progress[2] = 0
-            cycle_progress[3] = points / 2
-            cycle_progress[4] = 0
-            cycle_progress[5] = points / 2
+    if current_gait == Gait.TRI:
+        cycle_progress[0] = 0
+        cycle_progress[1] = points / 2
+        cycle_progress[2] = 0
+        cycle_progress[3] = points / 2
+        cycle_progress[4] = 0
+        cycle_progress[5] = points / 2
 
-            push_fraction = 3.1 / 6.0
-            speed_multiplier = 1
-            stride_length_multiplier = 1.2
-            lift_height_multiplier = 1.1
-            max_stride_length = 240
-            max_speed = 200
+        push_fraction = 3.1 / 6.0
+        speed_multiplier = 1
+        stride_length_multiplier = 1.2
+        lift_height_multiplier = 1.1
+        max_stride_length = 240
+        max_speed = 200
 
-        elif current_gait == Gait.WAVE:
-            # Offsets
-            cycle_progress[0] = 0
-            cycle_progress[1] = points / 6
-            cycle_progress[2] = (points / 6) * 2
-            cycle_progress[3] = (points / 6) * 5
-            cycle_progress[4] = (points / 6) * 4
-            cycle_progress[5] = (points / 6) * 3
+    elif current_gait == Gait.WAVE:
+        # Offsets
+        cycle_progress[0] = 0
+        cycle_progress[1] = points / 6
+        cycle_progress[2] = (points / 6) * 2
+        cycle_progress[3] = (points / 6) * 5
+        cycle_progress[4] = (points / 6) * 4
+        cycle_progress[5] = (points / 6) * 3
 
-            # Percentage Time On Ground
-            push_fraction = 4.9 / 6.0
+        # Percentage Time On Ground
+        push_fraction = 4.9 / 6.0
 
-            speed_multiplier = 0.40
-            stride_length_multiplier = 2
-            lift_height_multiplier = 1.2
-            max_stride_length = 150
-            max_speed = 160
+        speed_multiplier = 0.40
+        stride_length_multiplier = 2
+        lift_height_multiplier = 1.2
+        max_stride_length = 150
+        max_speed = 160
+
+    elif current_gait == Gait.RIPPLE:
+        # Offsets
+        cycle_progress[0] = 0
+        cycle_progress[1] = (points / 6) * 4
+        cycle_progress[2] = (points / 6) * 2
+        cycle_progress[3] = (points / 6) * 5
+        cycle_progress[4] = points / 6
+        cycle_progress[5] = (points / 6) * 3
+
+        # Percentage Time On Ground
+        push_fraction = 3.2 / 6.0
+
+        speed_multiplier = 1
+        stride_length_multiplier = 1.3
+        lift_height_multiplier = 1.1
+        max_stride_length = 220
+        max_speed = 200
+
+    elif current_gait == Gait.BI:
+        # Offsets
+        cycle_progress[0] = 0
+        cycle_progress[1] = points / 3
+        cycle_progress[2] = (points / 3) * 2
+        cycle_progress[3] = 0
+        cycle_progress[4] = points / 3
+        cycle_progress[5] = (points / 3) * 2
+
+        # Percentage Time On Ground
+        push_fraction = 2.1 / 6.0
+
+        speed_multiplier = 4
+        stride_length_multiplier = 1
+        lift_height_multiplier = 1.8
+        max_stride_length = 230
+        max_speed = 130
+
+    elif current_gait == Gait.QUAD:
+        # Offsets
+        cycle_progress[0] = 0
+        cycle_progress[1] = points / 3
+        cycle_progress[2] = (points / 3) * 2
+        cycle_progress[3] = 0
+        cycle_progress[4] = points / 3
+        cycle_progress[5] = (points / 3) * 2
+
+        # Percentage Time On Ground
+        push_fraction = 4.1 / 6.0
+
+        speed_multiplier = 1
+        stride_length_multiplier = 1.2
+        lift_height_multiplier = 1.1
+        max_stride_length = 220
+        max_speed = 200
+
+    elif current_gait == Gait.HOP:
+        # Offsets
+        cycle_progress[0] = 0
+        cycle_progress[1] = 0
+        cycle_progress[2] = 0
+        cycle_progress[3] = 0
+        cycle_progress[4] = 0
+        cycle_progress[5] = 0
+
+        # Percentage Time On Ground
+        push_fraction = 3 / 6.0
+
+        speed_multiplier = 1
+        stride_length_multiplier = 1.6
+        lift_height_multiplier = 2.5
+        max_stride_length = 240
+        max_speed = 200
 
         # Add other gait cases here...
 
@@ -219,3 +302,181 @@ def move_to_pos(leg, position):
     # This would be implemented to control the actual leg movement
     current_points[leg] = position
     pass
+
+
+def lerp(a, b, f):
+    """
+    Linear interpolation between a and b values
+
+    Args:
+        a: Starting value
+        b: Ending value
+        f: Interpolation factor (0.0 to 1.0)
+
+    Returns:
+        Interpolated value
+    """
+    return a * (1.0 - f) + (b * f)
+
+
+def lerp_vector2(a, b, f):
+    """
+    Linear interpolation between two Vector2 objects
+
+    Args:
+        a: Starting Vector2
+        b: Ending Vector2
+        f: Interpolation factor (0.0 to 1.0)
+
+    Returns:
+        Interpolated Vector2
+    """
+    return Vector2(lerp(a.x, b.x, f), lerp(a.y, b.y, f))
+
+
+def lerp_vector3(a, b, f):
+    """
+    Linear interpolation between two Vector3 objects
+
+    Args:
+        a: Starting Vector3
+        b: Ending Vector3
+        f: Interpolation factor (0.0 to 1.0)
+
+    Returns:
+        Interpolated Vector3
+    """
+    return Vector3(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f))
+
+
+def attach_servos():
+    """
+    Initialize and attach all servo motors
+    """
+    print('Attaching servos...')
+    # In Python implementation, this might involve initializing
+    # GPIO pins or a servo controller library
+    # For example, if using Adafruit ServoKit:
+    # from adafruit_servokit import ServoKit
+    # kit = ServoKit(channels=16)
+    # for i in range(18):
+    #     kit.servo[i].actuation_range = 180
+
+
+def rc_setup():
+    """
+    Initialize remote control communication
+    """
+    print('Setting up remote control...')
+    # This might involve setting up a radio module, Bluetooth, or WiFi
+    # For example, if using an RF24 module with a Python library:
+    # from RF24 import RF24
+    # radio = RF24(22, 0)
+    # radio.begin()
+    # radio.setPALevel(RF24.PA_LOW)
+    # radio.openReadingPipe(1, b'1Node')
+    # radio.startListening()
+
+
+def load_raw_offsets_from_eeprom():
+    """
+    Load servo calibration offsets from persistent storage
+    """
+    global raw_offsets
+
+    print('Loading calibration data...')
+    try:
+        # In Python, you might use a file or database instead of EEPROM
+        with open('servo_offsets.txt', 'r') as f:
+            for i, line in enumerate(f):
+                if i < 18:  # 18 servos
+                    raw_offsets[i] = float(line.strip())
+    except FileNotFoundError:
+        print('No calibration data found, using defaults')
+        raw_offsets = [0] * 18
+
+
+def state_initialize():
+    """
+    Initialize the hexapod to its starting state
+    """
+    global current_state, distance_from_ground
+
+    print('Initializing state...')
+    current_state = State.INITIALIZE
+
+    # Set initial position
+    distance_from_ground = distance_from_ground_base
+
+    # Move to initial position
+    # This would involve calculating the initial positions for all legs
+    # and sending commands to the servos
+
+    print('Initialization complete')
+    current_state = State.STANDING
+
+
+def get_send_nrf_data():
+    """
+    Exchange data with the remote control
+
+    Returns:
+        bool: True if connection is active, False otherwise
+    """
+    global rc_control_data
+
+    # In a real implementation, this would communicate with the remote control
+    # For example, using an RF24 radio module:
+    # if radio.available():
+    #     buffer = bytearray(radio.getDynamicPayloadSize())
+    #     radio.read(buffer, len(buffer))
+    #     # Parse buffer into rc_control_data
+    #     return True
+
+    # For simulation/testing:
+    # Simulate receiving data
+    # rc_control_data.joy1_X = 127  # Center position
+    # rc_control_data.joy1_Y = 127  # Center position
+
+    # For now, always return True to simulate an active connection
+    return True
+
+
+def standing_state():
+    """
+    Put the hexapod in a standing position
+    """
+    global current_state
+
+    if current_state != State.STANDING:
+        print('Standing State')
+        current_state = State.STANDING
+
+    # Calculate standing position for each leg
+    # For each leg, calculate a neutral position and move to it
+    # This would involve setting the leg positions to their default standing positions
+
+    # Example (pseudocode):
+    # for leg in range(6):
+    #     position = calculate_standing_position(leg)
+    #     move_to_pos(leg, position)
+
+
+def sleep_state():
+    """
+    Put the hexapod in a sleep/powered down position
+    """
+    global current_state
+
+    if current_state != State.SLEEP:
+        print('Sleep State')
+        current_state = State.SLEEP
+
+    # Move all legs to a resting position
+    # This typically involves lowering the body to the ground
+    # and positioning the legs in a way that minimizes servo load
+
+    # Example (pseudocode):
+    # for leg in range(6):
+    #     position = calculate_sleep_position(leg)
+    #     move_to_pos(leg, position)
