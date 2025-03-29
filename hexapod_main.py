@@ -4,7 +4,6 @@ import time
 from bezier import constrain, map_float, print_value, Vector2, Vector3
 from globals import (
     PRESSED,
-    base_offset,
     connected,
     current_gait,
     current_type,
@@ -23,11 +22,11 @@ from globals import (
     attack_cooldown,
 )
 
+from hexapod_attacks import slam_attack
 from nrf import (
     RC_Control_Data_Package,
     rc_control_data,
     rc_settings_data,
-    hex_settings_data,
     hex_sensor_data,
 )
 
@@ -100,6 +99,7 @@ def loop():
         process_settings_data(rc_settings_data)
 
 
+# AM - checked
 def process_control_data(data: RC_Control_Data_Package):
     global dynamic_stride_length, joy1_target_vector, joy1_target_magnitude
     global joy2_target_vector, joy2_target_magnitude, target_distance_from_ground
@@ -331,9 +331,7 @@ def move_to_pos(leg, pos):
 # AM - checked
 # This is a better implementation made by AI
 def load_raw_offsets_from_eeprom():
-    """
-    Load servo calibration offsets from persistent storage
-    """
+    """Load servo calibration offsets from persistent storage."""
     global raw_offsets
 
     print('Loading calibration data...')
@@ -349,52 +347,5 @@ def load_raw_offsets_from_eeprom():
 
 
 # AM - checked
-# Save offsets to the servo_offsets.txt used by load_raw_offsets_from_eeprom
-def save_offsets():
-    print('Saving rawOffsets to EEPROM (servo_offsets.txt). ', end='')
-    with open('servo_offsets.txt', 'w') as f:
-        for i in range(18):
-            f.write(f'{raw_offsets[i]}\n')
-    print('Done')
-
-
-# AM - checked
-def update_offset_variables():
-    global offsets, hex_settings_data
-
-    # updating Vector3 offsets[]
-    for i in range(6):
-        offsets[i] = Vector3(
-            raw_offsets[i * 3] + base_offset.x,
-            raw_offsets[i * 3 + 1] + base_offset.y,
-            raw_offsets[i * 3 + 2] + base_offset.z,
-        )
-
-    # updating hex_data.offsets[18]
-    for i in range(18):
-        hex_settings_data.offsets[i] = raw_offsets[i]
-
-
-# AM - checked
-def set_offsets_from_controller_data():
-    global raw_offsets
-
-    # don't set offsets data if the controller isn't connected
-    if rc_settings_data.offsets[0] == -128 or not connected:
-        return
-
-    print_raw_offsets()
-    for i in range(18):
-        raw_offsets[i] = rc_settings_data.offsets[i]
-
-    update_offset_variables()
-
-
-# AM - checked
 def print_connected_status():
     print(f'Connected: {"TRUE" if connected else "FALSE"}')
-
-
-# AM - checked
-def print_raw_offsets():
-    return  # This function is disabled in the original code

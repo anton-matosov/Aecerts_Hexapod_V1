@@ -1,5 +1,4 @@
-from enum import Enum
-
+import time
 from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3
 from globals import (
     control_points,
@@ -25,7 +24,6 @@ from globals import (
     max_stride_length,
     points,
     previous_gait,
-    rc_control_data,
     rotate_control_points,
     rotation_multiplier,
     State,
@@ -33,7 +31,16 @@ from globals import (
     stride_multiplier,
     t_array,
     turn_amount,
+    base_offset,
+    raw_offsets,
+    connected,
 )
+from nrf import (
+    rc_settings_data,
+    hex_settings_data,
+    rc_control_data,
+)
+from hexapod_initializations import a1, a2
 
 
 def car_state():
@@ -266,9 +273,10 @@ def move_to_pos(leg, position):
     pass
 
 
+# AM - checked
 def lerp(a, b, f):
     """
-    Linear interpolation between a and b values
+    Linear interpolation between a and b values.
 
     Args:
         a: Starting value
@@ -277,13 +285,15 @@ def lerp(a, b, f):
 
     Returns:
         Interpolated value
+
     """
     return a * (1.0 - f) + (b * f)
 
 
+# AM - checked
 def lerp_vector2(a, b, f):
     """
-    Linear interpolation between two Vector2 objects
+    Linear interpolation between two Vector2 objects.
 
     Args:
         a: Starting Vector2
@@ -292,13 +302,15 @@ def lerp_vector2(a, b, f):
 
     Returns:
         Interpolated Vector2
+
     """
     return Vector2(lerp(a.x, b.x, f), lerp(a.y, b.y, f))
 
 
+# AM - checked
 def lerp_vector3(a, b, f):
     """
-    Linear interpolation between two Vector3 objects
+    Linear interpolation between two Vector3 objects.
 
     Args:
         a: Starting Vector3
@@ -307,83 +319,53 @@ def lerp_vector3(a, b, f):
 
     Returns:
         Interpolated Vector3
+
     """
     return Vector3(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f))
 
 
-def attach_servos():
-    """
-    Initialize and attach all servo motors
-    """
-    print('Attaching servos...')
-    # In Python implementation, this might involve initializing
-    # GPIO pins or a servo controller library
-    # For example, if using Adafruit ServoKit:
-    # from adafruit_servokit import ServoKit
-    # kit = ServoKit(channels=16)
-    # for i in range(18):
-    #     kit.servo[i].actuation_range = 180
-
-
-def rc_setup():
-    """
-    Initialize remote control communication
-    """
-    print('Setting up remote control...')
-    # This might involve setting up a radio module, Bluetooth, or WiFi
-    # For example, if using an RF24 module with a Python library:
-    # from RF24 import RF24
-    # radio = RF24(22, 0)
-    # radio.begin()
-    # radio.setPALevel(RF24.PA_LOW)
-    # radio.openReadingPipe(1, b'1Node')
-    # radio.startListening()
-
-
-def load_raw_offsets_from_eeprom():
-    """
-    Load servo calibration offsets from persistent storage
-    """
-    global raw_offsets
-
-    print('Loading calibration data...')
-    try:
-        # In Python, you might use a file or database instead of EEPROM
-        with open('servo_offsets.txt', 'r') as f:
-            for i, line in enumerate(f):
-                if i < 18:  # 18 servos
-                    raw_offsets[i] = float(line.strip())
-    except FileNotFoundError:
-        print('No calibration data found, using defaults')
-        raw_offsets = [0] * 18
-
-
 def state_initialize():
-    """
-    Initialize the hexapod to its starting state
-    """
-    global current_state, distance_from_ground
+    # """Initialize the hexapod to its starting state."""
+    # global current_state, distance_from_ground
 
-    print('Initializing state...')
-    current_state = State.INITIALIZE
+    # print('Initializing state...')
+    # current_state = State.INITIALIZE
 
-    # Set initial position
-    distance_from_ground = distance_from_ground_base
+    # # Set initial position
+    # distance_from_ground = distance_from_ground_base
 
-    # Move to initial position
-    # This would involve calculating the initial positions for all legs
-    # and sending commands to the servos
+    # # Move to initial position
+    # # This would involve calculating the initial positions for all legs
+    # # and sending commands to the servos
 
-    print('Initialization complete')
-    current_state = State.STANDING
+    # print('Initialization complete')
+    # current_state = State.STANDING
+    move_to_pos(0, Vector3(160, 0, 0))
+    move_to_pos(1, Vector3(160, 0, 0))
+    move_to_pos(2, Vector3(160, 0, 0))
+    move_to_pos(3, Vector3(160, 0, 0))
+    move_to_pos(4, Vector3(160, 0, 0))
+    move_to_pos(5, Vector3(160, 0, 0))
+
+    time.sleep(25 / 1000)
+
+    move_to_pos(0, Vector3(225, 0, 115))
+    move_to_pos(1, Vector3(225, 0, 115))
+    move_to_pos(2, Vector3(225, 0, 115))
+    move_to_pos(3, Vector3(225, 0, 115))
+    move_to_pos(4, Vector3(225, 0, 115))
+    move_to_pos(5, Vector3(225, 0, 115))
+
+    time.sleep(50 / 1000)
 
 
 def get_send_nrf_data():
     """
-    Exchange data with the remote control
+    Exchange data with the remote control.
 
     Returns:
         bool: True if connection is active, False otherwise
+
     """
     global rc_control_data
 
@@ -405,9 +387,7 @@ def get_send_nrf_data():
 
 
 def standing_state():
-    """
-    Put the hexapod in a standing position
-    """
+    """Put the hexapod in a standing position."""
     global current_state
 
     if current_state != State.STANDING:
@@ -425,9 +405,7 @@ def standing_state():
 
 
 def sleep_state():
-    """
-    Put the hexapod in a sleep/powered down position
-    """
+    """Put the hexapod in a sleep/powered down position."""
     global current_state
 
     if current_state != State.SLEEP:
@@ -445,9 +423,7 @@ def sleep_state():
 
 
 def calibration_state():
-    """
-    Put the hexapod in calibration mode
-    """
+    """Put the hexapod in calibration mode."""
     global current_state, current_points
 
     if current_state != State.CALIBRATE:
@@ -478,3 +454,50 @@ def calibration_state():
             next_y = min(current_points[i].y + 5, target_calibration.y)
             next_z = min(current_points[i].z + 5, target_calibration.z)
             move_to_pos(i, Vector3(next_x, next_y, next_z))
+
+
+# AM - checked
+# Save offsets to the servo_offsets.txt used by load_raw_offsets_from_eeprom
+def save_offsets():
+    print('Saving rawOffsets to EEPROM (servo_offsets.txt). ', end='')
+    with open('servo_offsets.txt', 'w') as f:
+        for i in range(18):
+            f.write(f'{raw_offsets[i]}\n')
+    print('Done')
+
+
+# AM - checked
+def update_offset_variables():
+    global offsets, hex_settings_data
+
+    # updating Vector3 offsets[]
+    for i in range(6):
+        offsets[i] = Vector3(
+            raw_offsets[i * 3] + base_offset.x,
+            raw_offsets[i * 3 + 1] + base_offset.y,
+            raw_offsets[i * 3 + 2] + base_offset.z,
+        )
+
+    # updating hex_data.offsets[18]
+    for i in range(18):
+        hex_settings_data.offsets[i] = raw_offsets[i]
+
+
+# AM - checked
+def set_offsets_from_controller_data():
+    global raw_offsets
+
+    # don't set offsets data if the controller isn't connected
+    if rc_settings_data.offsets[0] == -128 or not connected:
+        return
+
+    print_raw_offsets()
+    for i in range(18):
+        raw_offsets[i] = rc_settings_data.offsets[i]
+
+    update_offset_variables()
+
+
+# AM - checked
+def print_raw_offsets():
+    return  # This function is disabled in the original code
