@@ -1,77 +1,39 @@
-from bezier import Vector2, Vector3, get_point_on_bezier_curve, map_float, constrain
 from enum import Enum
 
-
-class State(Enum):
-    INITIALIZE = 0
-    STAND = 1
-    CAR = 2
-    CRAB = 3
-    CALIBRATE = 4
-    SLAM_ATTACK = 5
-    SLEEP = 6
-    ATTACH = 7
-
-
-class LegState(Enum):
-    PROPELLING = 0
-    LIFTING = 1
-    STANDING = 2
-    RESET = 3
-
-
-class Gait(Enum):
-    TRI = 0
-    RIPPLE = 1
-    WAVE = 2
-    QUAD = 3
-    BI = 4
-    HOP = 5
-
-
-# Car state variables
-forward_amount = 0
-turn_amount = 0
-t_array = [0] * 6
-control_points_amount = 0
-rotate_control_points_amount = 0
-push_fraction = 3.0 / 6.0
-speed_multiplier = 0.5
-stride_length_multiplier = 1.5
-lift_height_multiplier = 1.0
-max_stride_length = 200
-max_speed = 100
-leg_placement_angle = 56
-
-left_slider = 50
-global_speed_multiplier = 0.55
-global_rotation_multiplier = 0.55
-
-# These would be initialized elsewhere in the full implementation
-control_points = [Vector3() for _ in range(10)]  # Assuming max 10 control points
-rotate_control_points = [Vector3() for _ in range(10)]
-cycle_start_points = [Vector3() for _ in range(6)]
-current_points = [Vector3() for _ in range(6)]
-cycle_progress = [0] * 6
-leg_states = [LegState.RESET] * 6
-stride_multiplier = [1.0] * 6
-rotation_multiplier = [1.0] * 6
-distance_from_ground = -60
-distance_from_center = 173
-lift_height = 130
-land_height = 70
-stride_overshoot = 10
-points = 1000
-
-
-# RC control data class (simplified)
-class RC_Control_Data:
-    def __init__(self):
-        self.slider1 = 50
-        # Add other fields as needed
-
-
-rc_control_data = RC_Control_Data()
+from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3
+from globals import (
+    control_points,
+    current_gait,
+    current_points,
+    current_state,
+    cycle_progress,
+    cycle_start_points,
+    distance_from_center,
+    distance_from_ground,
+    distance_from_ground_base,
+    dynamic_stride_length,
+    forward_amount,
+    Gait,
+    global_rotation_multiplier,
+    global_speed_multiplier,
+    joy1_current_magnitude,
+    joy1_current_vector,
+    joy2_current_vector,
+    leg_placement_angle,
+    leg_states,
+    LegState,
+    max_stride_length,
+    points,
+    previous_gait,
+    rc_control_data,
+    rotate_control_points,
+    rotation_multiplier,
+    State,
+    stride_length_multiplier,
+    stride_multiplier,
+    t_array,
+    turn_amount,
+)
 
 
 def car_state():
@@ -480,3 +442,39 @@ def sleep_state():
     # for leg in range(6):
     #     position = calculate_sleep_position(leg)
     #     move_to_pos(leg, position)
+
+
+def calibration_state():
+    """
+    Put the hexapod in calibration mode
+    """
+    global current_state, current_points
+
+    if current_state != State.CALIBRATE:
+        print('Calibration State')
+
+    current_state = State.CALIBRATE
+
+    # Target position for calibration
+    target_calibration = Vector3(a1 + 43, 0, a2 + 185)
+    in_between_z = -20
+
+    legs_up = True
+
+    # Lifting legs up so the hex is sitting on the ground
+    for i in range(6):
+        if current_points[i].z < in_between_z:
+            legs_up = False
+            next_z = lerp(current_points[i].z, in_between_z + 2, 0.03)
+            move_to_pos(i, Vector3(current_points[i].x, current_points[i].y, next_z))
+
+    if legs_up:
+        # If connected to the controller, use its offsets
+        set_offsets_from_controller_data()
+
+        # Move legs to calibration position
+        for i in range(6):
+            next_x = min(current_points[i].x + 5, target_calibration.x)
+            next_y = min(current_points[i].y + 5, target_calibration.y)
+            next_z = min(current_points[i].z + 5, target_calibration.z)
+            move_to_pos(i, Vector3(next_x, next_y, next_z))

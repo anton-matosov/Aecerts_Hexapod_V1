@@ -107,7 +107,7 @@ void loop() {
   elapsedTime = millis() - loopStartTime;
   loopStartTime = millis();
 
-  connected = GetSendNRFData(); 
+  connected = GetSendNRFData();
 
   if (!connected) {
     //attachServoState();
@@ -126,7 +126,7 @@ void processControlData(const RC_Control_Data_Package& data) {
 
   /*sleep from controller*/
   if (data.sleep == 1) {
-    
+
     sleepState();
     return;
   }
@@ -162,7 +162,7 @@ void processControlData(const RC_Control_Data_Package& data) {
   joy2CurrentMagnitude = lerp(joy2CurrentMagnitude, joy2TargetMagnitude, 0.12);
 
   previousGait = currentGait;
-  currentGait = gaits[data.gait]; 
+  currentGait = gaits[data.gait];
 
   /*Drive*/
   if (abs(joy1CurrentMagnitude) >= 10 || abs(joy2CurrentMagnitude) >= 10) {
@@ -196,7 +196,7 @@ void processSettingsData(const RC_Settings_Data_Package& data) {
   if (data.calibrating == 1) {
     calibrationState();
     return;
-  }  
+  }
 
   //finished calibrating, save offsets.
   if (currentState == Calibrate) {
@@ -230,7 +230,7 @@ int angleToMicroseconds(double angle) {
 
 void rotateToAngle(int leg, Vector3 targetRot) {
   if(!servosAttached) attachServos();
-  
+
   int coxaMicroseconds = angleToMicroseconds(targetRot.x);
   int femurMicroseconds = angleToMicroseconds(targetRot.y);
   int tibiaMicroseconds = angleToMicroseconds(targetRot.z);
@@ -363,7 +363,7 @@ void moveToPos(int leg, Vector3 pos) {
 
 #define EEPROM_OFFSETS_ADDR 0  // 18 bytes
 
-void saveOffsets() {  
+void saveOffsets() {
   Serial.print("Saving rawOffsets to EEPROM. ");
   for (int i = 0; i < 18; i++) {
     EEPROM.put(EEPROM_OFFSETS_ADDR + i * sizeof(int8_t), rawOffsets[i]);
@@ -382,22 +382,24 @@ void loadRawOffsetsFromEEPROM() {
   printRawOffsets();
 }
 
-void updateOffsetVariables() {  
+void updateOffsetVariables() {
   //updating Vector3 offsets[]
   //Serial.println("Filling offsets from rawOffsets.");
   for (int i = 0; i < 6; ++i) {
-    offsets[i] = Vector3(rawOffsets[i * 3] + baseOffset.x, rawOffsets[i * 3 + 1] + baseOffset.y, rawOffsets[i * 3 + 2] + baseOffset.z);
+    offsets[i] = Vector3(rawOffsets[i * 3] + baseOffset.x,
+    rawOffsets[i * 3 + 1] + baseOffset.y,
+    rawOffsets[i * 3 + 2] + baseOffset.z);
   }
 
   //updating hex_data.offsets[18]
-  //Serial.println("Filling hex_data.offsets from rawOffsets.");  
+  //Serial.println("Filling hex_data.offsets from rawOffsets.");
   for (int i = 0; i < 18; i++) {
     hex_settings_data.offsets[i] = rawOffsets[i];
   }
 }
 
-void setOffsetsFromControllerData() {    
-  
+void setOffsetsFromControllerData() {
+
   //dont set offsets data if the controller isnt connected
   if(rc_settings_data.offsets[0] == -128 || !connected){
     return;
@@ -410,7 +412,7 @@ void setOffsetsFromControllerData() {
   }
 
   updateOffsetVariables();
-  
+
   //Serial.println("Done");
 }
 
