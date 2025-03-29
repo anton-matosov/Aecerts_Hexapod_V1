@@ -14,6 +14,7 @@ from nrf import rc_control_data
 slam_started = False
 
 
+# AM - checked
 def slam_attack():
     global slam_started, current_state
     set_cycle_start_points()
@@ -52,6 +53,7 @@ def slam_attack():
     set_cycle_start_points()
 
 
+# AM - checked
 def get_foot_placement_path_point(leg, t):
     x_offset = 0
     y_offset = 0
@@ -82,6 +84,7 @@ def get_foot_placement_path_point(leg, t):
     return point
 
 
+# AM - checked
 def get_leap_path_point(leg, t):
     x = cycle_start_points[leg].x
     start = cycle_start_points[leg]
@@ -100,6 +103,7 @@ def get_leap_path_point(leg, t):
     return point
 
 
+# AM - checked
 def get_slam_path_point(leg, t):
     slam_percentage = 0.70
     land_percentage = 0.95
