@@ -1,33 +1,4 @@
-from adafruit_servokit import ServoKit
-from vector3 import Vector3
-
-# Initialize ServoKit for controlling servos
-kit = ServoKit(channels=16)  # Adjust channels as needed, might need multiple controllers
-
-# Individual servo objects
-coxa1 = kit.servo[0]
-femur1 = kit.servo[1]
-tibia1 = kit.servo[2]
-
-coxa2 = kit.servo[3]
-femur2 = kit.servo[4]
-tibia2 = kit.servo[5]
-
-coxa3 = kit.servo[6]
-femur3 = kit.servo[7]
-tibia3 = kit.servo[8]
-
-coxa4 = kit.servo[9]
-femur4 = kit.servo[10]
-tibia4 = kit.servo[11]
-
-coxa5 = kit.servo[12]
-femur5 = kit.servo[13]
-tibia5 = kit.servo[14]
-
-coxa6 = kit.servo[15]
-femur6 = kit.servo[16]
-tibia6 = kit.servo[17]
+from bezier import Vector3
 
 # Pin definitions
 coxa1_pin = 22
@@ -76,22 +47,67 @@ servo_pins = [
     tibia6_pin,
 ]
 
+
+# Hand crafted stub for Servo class
+# TODO(AM): Implement the servo class to pass in the hexapod sim
+class Servo:
+    def attach(self, pin, min_pulse, max_pulse):
+        # Placeholder for setting pulse width range
+        self.pin = pin
+
+
+# AM - checked
+# Individual servo objects
+coxa1 = Servo()
+femur1 = Servo()
+tibia1 = Servo()
+
+coxa2 = Servo()
+femur2 = Servo()
+tibia2 = Servo()
+
+coxa3 = Servo()
+femur3 = Servo()
+tibia3 = Servo()
+
+coxa4 = Servo()
+femur4 = Servo()
+tibia4 = Servo()
+
+coxa5 = Servo()
+femur5 = Servo()
+tibia5 = Servo()
+
+coxa6 = Servo()
+femur6 = Servo()
+tibia6 = Servo()
+
+
+# AM - checked
 # Leg dimensions
 a1 = 46.0  # Coxa Length
 a2 = 108.0  # Femur Length
 a3 = 200.0  # Tibia Length
 leg_length = a1 + a2 + a3
 
+
+# AM - checked
 # Position tracking
 current_points = [Vector3() for _ in range(6)]
 cycle_start_points = [Vector3() for _ in range(6)]
 
+
+# AM - checked
 current_rot = Vector3(180, 0, 180)
 target_rot = Vector3(180, 0, 180)
 
+
+# AM - checked
 stride_multiplier = [1, 1, 1, -1, -1, -1]
 rotation_multiplier = [-1, 0, 1, -1, 0, 1]
 
+
+# AM - checked
 control_points = [Vector3() for _ in range(10)]
 rotate_control_points = [Vector3() for _ in range(10)]
 attack_control_points = [Vector3() for _ in range(10)]
@@ -99,53 +115,74 @@ attack_control_points = [Vector3() for _ in range(10)]
 servos_attached = False
 
 
+# AM - checked
 def attach_servos():
     """Attach all servos to their pins with specified pulse width range"""
     global servos_attached
 
     try:
-        coxa1.set_pulse_width_range(500, 2500)
-        femur1.set_pulse_width_range(500, 2500)
-        tibia1.set_pulse_width_range(500, 2500)
+        coxa1.attach(coxa1_pin, 500, 2500)
+        femur1.attach(femur1_pin, 500, 2500)
+        tibia1.attach(tibia1_pin, 500, 2500)
 
-        coxa2.set_pulse_width_range(500, 2500)
-        femur2.set_pulse_width_range(500, 2500)
-        tibia2.set_pulse_width_range(500, 2500)
+        coxa2.attach(coxa2_pin, 500, 2500)
+        femur2.attach(femur2_pin, 500, 2500)
+        tibia2.attach(tibia2_pin, 500, 2500)
 
-        coxa3.set_pulse_width_range(500, 2500)
-        femur3.set_pulse_width_range(500, 2500)
-        tibia3.set_pulse_width_range(500, 2500)
+        coxa3.attach(coxa3_pin, 500, 2500)
+        femur3.attach(femur3_pin, 500, 2500)
+        tibia3.attach(tibia3_pin, 500, 2500)
 
-        coxa4.set_pulse_width_range(500, 2500)
-        femur4.set_pulse_width_range(500, 2500)
-        tibia4.set_pulse_width_range(500, 2500)
+        coxa4.attach(coxa4_pin, 500, 2500)
+        femur4.attach(femur4_pin, 500, 2500)
+        tibia4.attach(tibia4_pin, 500, 2500)
 
-        coxa5.set_pulse_width_range(500, 2500)
-        femur5.set_pulse_width_range(500, 2500)
-        tibia5.set_pulse_width_range(500, 2500)
+        coxa5.attach(coxa5_pin, 500, 2500)
+        femur5.attach(femur5_pin, 500, 2500)
+        tibia5.attach(tibia5_pin, 500, 2500)
 
-        coxa6.set_pulse_width_range(500, 2500)
-        femur6.set_pulse_width_range(500, 2500)
-        tibia6.set_pulse_width_range(500, 2500)
-    except Exception as e:
+        coxa6.attach(coxa6_pin, 500, 2500)
+        femur6.attach(femur6_pin, 500, 2500)
+        tibia6.attach(tibia6_pin, 500, 2500)
+    except Exception as e:  # noqa: BLE001
         print(f'Error attaching servos: {e}')
 
     servos_attached = True
     print('Servos Attached')
 
 
+# AM - checked
 def detach_servos():
     """Detach all servos"""
     global servos_attached
 
-    # In Python with ServoKit, we might not have a direct "detach" method
-    # We could set servos to a neutral position or disable them
     try:
-        # Implementation depends on your servo library
-        # This is a placeholder - you may need to adjust based on your hardware
-        pass
-    except Exception as e:
+        coxa1.detach()
+        femur1.detach()
+        tibia1.detach()
+
+        coxa2.detach()
+        femur2.detach()
+        tibia2.detach()
+
+        coxa3.detach()
+        femur3.detach()
+        tibia3.detach()
+
+        coxa4.detach()
+        femur4.detach()
+        tibia4.detach()
+
+        coxa5.detach()
+        femur5.detach()
+        tibia5.detach()
+
+        coxa6.detach()
+        femur6.detach()
+        tibia6.detach()
+
+        servos_attached = False
+    except Exception as e:  # noqa: BLE001
         print(f'Error detaching servos: {e}')
 
-    servos_attached = False
     print('Servos Detached')

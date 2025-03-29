@@ -110,29 +110,3 @@ lift_height = 130
 land_height = 70
 stride_overshoot = 10
 points = 1000
-
-
-# RC data classes
-class RC_Control_Data_Package:
-    def __init__(self):
-        self.joy1_X = 127
-        self.joy1_Y = 127
-        self.joy2_X = 127
-        self.joy2_Y = 127
-        self.joy1_Button = UNPRESSED
-        self.slider1 = 50
-        self.slider2 = 50
-        self.sleep = 0
-        self.idle = 0
-        self.gait = 0
-        self.dynamic_stride_length = True
-
-
-class RC_Settings_Data_Package:
-    def __init__(self):
-        self.calibrating = 0
-
-
-# Initialize global instances
-rc_control_data = RC_Control_Data_Package()
-rc_settings_data = RC_Settings_Data_Package()

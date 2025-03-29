@@ -3,6 +3,7 @@ import time
 
 from bezier import constrain, map_float, print_value, Vector2, Vector3
 from globals import (
+    PRESSED,
     base_offset,
     connected,
     current_gait,
@@ -17,12 +18,19 @@ from globals import (
     offsets,
     PackageType,
     raw_offsets,
-    rc_control_data,
-    rc_settings_data,
     State,
     current_state,
-    hex_settings_data,
+    attack_cooldown,
 )
+
+from nrf import (
+    RC_Control_Data_Package,
+    rc_control_data,
+    rc_settings_data,
+    hex_settings_data,
+    hex_sensor_data,
+)
+
 from hexapod_initializations import (
     a1,
     a2,
@@ -63,6 +71,7 @@ from hexapod_state import (
 )
 
 
+# AM - checked
 def setup():
     print('Initializing...')
     attach_servos()
@@ -71,6 +80,7 @@ def setup():
     state_initialize()
 
 
+# AM - checked
 def loop():
     global elapsed_time, loop_start_time, connected
 
@@ -90,12 +100,12 @@ def loop():
         process_settings_data(rc_settings_data)
 
 
-def process_control_data(data):
+def process_control_data(data: RC_Control_Data_Package):
     global dynamic_stride_length, joy1_target_vector, joy1_target_magnitude
     global joy2_target_vector, joy2_target_magnitude, target_distance_from_ground
     global distance_from_ground, distance_from_center, joy1_current_vector
     global joy1_current_magnitude, joy2_current_vector, joy2_current_magnitude
-    global previous_gait, current_gait, time_since_last_input, attack_cooldown
+    global previous_gait, current_gait, time_since_last_input, attack_cooldown, loop_start_time
 
     dynamic_stride_length = data.dynamic_stride_length
 
@@ -116,10 +126,10 @@ def process_control_data(data):
     joy2y = map_float(data.joy2_Y, 0, 254, -100, 100)
 
     joy1_target_vector = Vector2(joy1x, joy1y)
-    joy1_target_magnitude = constrain(math.sqrt(joy1x**2 + joy1y**2), 0, 100)
+    joy1_target_magnitude = constrain(math.hypot(joy1x, joy1y), 0, 100)
 
     joy2_target_vector = Vector2(joy2x, joy2y)
-    joy2_target_magnitude = constrain(math.sqrt(joy2x**2 + joy2y**2), 0, 100)
+    joy2_target_magnitude = constrain(math.hypot(joy2x, joy2y), 0, 100)
 
     # Process height adjustment
     target_distance_from_ground = distance_from_ground_base + (data.slider2 * -1.7)
@@ -150,6 +160,18 @@ def process_control_data(data):
     if abs(time_since_last_input - time.time() * 1000) > 5:
         standing_state()
         return
+
+    # Attack
+    if data.joy1_Button == PRESSED and attack_cooldown == 0:
+        print('slam attack')
+        reset_movement_vectors()
+        slam_attack()
+        standing_state()
+        attack_cooldown = 50
+        loop_start_time = time.time() * 1000
+        return
+    else:
+        attack_cooldown = max(attack_cooldown - elapsed_time, 0)
 
 
 # AM - checked
