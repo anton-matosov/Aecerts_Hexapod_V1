@@ -4,22 +4,9 @@ import time
 from bezier import constrain, map_float, Vector2
 from globals import (
     PRESSED,
-    connected,
-    current_gait,
-    current_type,
-    distance_from_ground,
-    distance_from_ground_base,
-    joy1_current_magnitude,
-    joy1_current_vector,
-    joy2_current_magnitude,
-    joy2_current_vector,
-    loop_start_time,
+    g,
     PackageType,
-    raw_offsets,
     State,
-    current_state,
-    attack_cooldown,
-    time_since_last_input,
 )
 
 from hexapod_attacks import slam_attack
@@ -33,7 +20,6 @@ from hexapod_state import (
     calibration_state,
     get_send_nrf_data,
     lerp,
-    lerp_vector2,
     sleep_state,
     standing_state,
     state_initialize,
@@ -55,21 +41,19 @@ def setup():
 
 # AM - checked
 def loop():
-    global elapsed_time, loop_start_time, connected
+    g.elapsed_time = time.time() * 1000 - g.loop_start_time
+    g.loop_start_time = time.time() * 1000
 
-    elapsed_time = time.time() * 1000 - loop_start_time
-    loop_start_time = time.time() * 1000
+    g.connected = get_send_nrf_data()
 
-    connected = get_send_nrf_data()
-
-    if not connected:
+    if not g.connected:
         sleep_state()
         return
 
     # Process data based on type
-    if current_type == PackageType.RC_CONTROL_DATA:
+    if g.current_type == PackageType.RC_CONTROL_DATA:
         process_control_data(rc_control_data)
-    if current_type == PackageType.RC_SETTINGS_DATA:
+    if g.current_type == PackageType.RC_SETTINGS_DATA:
         process_settings_data(rc_settings_data)
 
 
@@ -114,10 +98,10 @@ def process_control_data(data: RC_Control_Data_Package):
     distance_from_center = 170
 
     # Smooth joystick movements
-    joy1_current_vector = lerp_vector2(joy1_current_vector, joy1_target_vector, 0.08)
+    joy1_current_vector = lerp(joy1_current_vector, joy1_target_vector, 0.08)
     joy1_current_magnitude = lerp(joy1_current_magnitude, joy1_target_magnitude, 0.08)
 
-    joy2_current_vector = lerp_vector2(joy2_current_vector, joy2_target_vector, 0.12)
+    joy2_current_vector = lerp(joy2_current_vector, joy2_target_vector, 0.12)
     joy2_current_magnitude = lerp(joy2_current_magnitude, joy2_target_magnitude, 0.12)
 
     previous_gait = current_gait

@@ -36,77 +36,84 @@ class PackageType(Enum):
     HEXAPOD_SENSOR_DATA = 4
 
 
-current_type = PackageType.RC_CONTROL_DATA
-
 # Button states
 UNPRESSED = 0x1
 PRESSED = 0x0
 
-# Global variables
-connected = False
-dynamic_stride_length = True
 
-total_gaits = 6
-gaits = [Gait.TRI, Gait.RIPPLE, Gait.WAVE, Gait.QUAD, Gait.BI, Gait.HOP]
+class GlobalState:
+    def __init__(self):
+        self.current_type = PackageType.RC_CONTROL_DATA
 
-raw_offsets = [0] * 18
-base_offset = Vector3(90, 50, -10)
-offsets = [Vector3() for _ in range(6)]
+        # Global variables
+        self.connected = False
+        self.dynamic_stride_length = True
 
-current_state = State.INITIALIZE
-current_gait = Gait.TRI
-previous_gait = Gait.TRI
-current_gait_id = 0
+        self.total_gaits = 6
+        self.gaits = [Gait.TRI, Gait.RIPPLE, Gait.WAVE, Gait.QUAD, Gait.BI, Gait.HOP]
 
-standing_distance_adjustment = 0
-distance_from_ground_base = -60
-target_distance_from_ground = 0
+        self.raw_offsets = [0] * 18
+        self.base_offset = Vector3(90, 50, -10)
+        self.offsets = [Vector3() for _ in range(6)]
 
-joy1_target_vector = Vector2(0, 0)
-joy1_target_magnitude = 0
-joy1_current_vector = Vector2(0, 0)
-joy1_current_magnitude = 0
+        self.current_state = State.INITIALIZE
+        self.current_gait = Gait.TRI
+        self.previous_gait = Gait.TRI
+        self.current_gait_id = 0
 
-joy2_target_vector = Vector2(0, 0)
-joy2_target_magnitude = 0
-joy2_current_vector = Vector2(0, 0)
-joy2_current_magnitude = 0
+        self.standing_distance_adjustment = 0
+        self.distance_from_ground_base = -60
+        self.target_distance_from_ground = 0
 
-time_since_last_input = 0
-attack_cooldown = 0
-elapsed_time = 0
-loop_start_time = 0
+        self.joy1_target_vector = Vector2(0, 0)
+        self.joy1_target_magnitude = 0
+        self.joy1_current_vector = Vector2(0, 0)
+        self.joy1_current_magnitude = 0
 
-# Car state variables
-forward_amount = 0
-turn_amount = 0
-t_array = [0] * 6
-control_points_amount = 0
-rotate_control_points_amount = 0
-push_fraction = 3.0 / 6.0
-speed_multiplier = 0.5
-stride_length_multiplier = 1.5
-lift_height_multiplier = 1.0
-max_stride_length = 200
-max_speed = 100
-leg_placement_angle = 56
+        self.joy2_target_vector = Vector2(0, 0)
+        self.joy2_target_magnitude = 0
+        self.joy2_current_vector = Vector2(0, 0)
+        self.joy2_current_magnitude = 0
 
-left_slider = 50
-global_speed_multiplier = 0.55
-global_rotation_multiplier = 0.55
+        self.time_since_last_input = 0
+        self.attack_cooldown = 0
+        self.elapsed_time = 0
+        self.loop_start_time = 0
 
-# These would be initialized elsewhere in the full implementation
-control_points = [Vector3() for _ in range(10)]  # Assuming max 10 control points
-rotate_control_points = [Vector3() for _ in range(10)]
-cycle_start_points = [Vector3() for _ in range(6)]
-current_points = [Vector3() for _ in range(6)]
-cycle_progress = [0] * 6
-leg_states = [LegState.RESET] * 6
-stride_multiplier = [1.0] * 6
-rotation_multiplier = [1.0] * 6
-distance_from_ground = -60
-distance_from_center = 173
-lift_height = 130
-land_height = 70
-stride_overshoot = 10
-points = 1000
+        # Car state variables
+        self.forward_amount = 0
+        self.turn_amount = 0
+        self.t_array = [0] * 6
+        self.control_points_amount = 0
+        self.rotate_control_points_amount = 0
+        self.push_fraction = 3.0 / 6.0
+        self.speed_multiplier = 0.5
+        self.stride_length_multiplier = 1.5
+        self.lift_height_multiplier = 1.0
+        self.max_stride_length = 200
+        self.max_speed = 100
+        self.leg_placement_angle = 56
+
+        self.left_slider = 50
+        self.global_speed_multiplier = 0.55
+        self.global_rotation_multiplier = 0.55
+
+        # These would be initialized elsewhere in the full implementation
+        self.control_points = [Vector3() for _ in range(10)]  # Assuming max 10 control points
+        self.rotate_control_points = [Vector3() for _ in range(10)]
+        self.cycle_start_points = [Vector3() for _ in range(6)]
+        self.current_points = [Vector3() for _ in range(6)]
+        self.cycle_progress = [0] * 6
+        self.leg_states = [LegState.RESET] * 6
+        self.stride_multiplier = [1.0] * 6
+        self.rotation_multiplier = [1.0] * 6
+        self.distance_from_ground = -60
+        self.distance_from_center = 173
+        self.lift_height = 130
+        self.land_height = 70
+        self.stride_overshoot = 10
+        self.points = 1000
+
+
+# Create a singleton instance
+g = GlobalState()

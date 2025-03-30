@@ -33,7 +33,7 @@ from hexapod_initializations import (
 )
 from globals import (
     constrain,
-    offsets,
+    g,
 )
 from nrf import hex_sensor_data
 
@@ -41,13 +41,11 @@ from nrf import hex_sensor_data
 # AM - checked
 # merge of 2 setters to make it pythonic
 def set_cycle_start_points(leg=None):
-    global cycle_start_points, current_points
-
     if leg is not None:
-        cycle_start_points[leg] = current_points[leg]
+        g.cycle_start_points[leg] = g.current_points[leg]
     else:
         for i in range(6):
-            cycle_start_points[i] = current_points[i]
+            g.cycle_start_points[i] = g.current_points[i]
 
 
 # AM - checked
