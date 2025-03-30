@@ -1,7 +1,7 @@
 #!./.venv/bin/python
 
 from matplotlib import pyplot as plt
-from globals import PRESSED
+from globals import PRESSED, Gait
 from hexapod_initializations import setup_sim_legs, a1, a2, a3
 from models import HexapodModel
 from plotting import plot_hexapod, update_hexapod_plot
@@ -22,6 +22,7 @@ setup_sim_legs(hexapod)
 hexapod.forward_kinematics(0.0, 81.19264931247422, 137.66638455325148)
 fig, ax, plot_data = plot_hexapod(hexapod)
 
+rc_control_data.gait = Gait.WAVE
 hexapod_main.setup()
 running = True
 while running:

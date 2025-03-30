@@ -50,24 +50,20 @@ def setup_sim_legs(hexapod):
 
 
 def rotate_sim_leg(leg, target_rot):
-    return
-
     if sim_legs is None:
         return
 
-    # moved leg: sim_leg.label='right_back', target_pos=(160, 0, 0) alpha=0.0 beta=-128.53330597305725 gamma=153.5203255020375
-    # right_back_coxa angle=0.0 ms=500
-    # right_back_femur angle=128.53330597305725 ms=1928
-    # right_back_tibia angle=26.479674497962502 ms=794
+    sim_leg = sim_legs[leg]
+    flip = sim_leg.label.startswith('right')
+    sim_leg.forward_kinematics(-target_rot.x if flip else target_rot.x, -target_rot.y, target_rot.z)
 
-    sim_legs[leg].forward_kinematics(target_rot.x, -target_rot.y, target_rot.z)
-
-    foot = sim_legs[leg].tibia_end
-    foot_local = sim_legs[leg].to_local(foot)
+    # foot = sim_legs[leg].tibia_end
+    # foot_local = sim_legs[leg].to_local(foot)
     # print(f'rotaplt.sleepted leg: {sim_legs[leg].label=}, {target_rot=} {foot=} {foot_local=}')
 
 
 def move_sim_leg_to_pos(leg, target_pos):
+    return
     if sim_legs is None:
         return
 
