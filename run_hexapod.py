@@ -27,10 +27,11 @@ fig, ax, plot_data = plot_hexapod(hexapod)
 rc_control_data.gait = Gait.TRI
 hexapod_main.setup()
 
+frames_to_collect = 60
+colors = np.linspace(1, 0, frames_to_collect)
+
 leg_tips = {}
-collecting_frames_range = (50, 130)
-plotted = False
-collected = False
+leg_tip_collections = {}
 
 frame = 0
 while plt.get_fignums(): # window(s) open
@@ -44,27 +45,27 @@ while plt.get_fignums(): # window(s) open
     hexapod_main.loop()
     update_hexapod_plot(hexapod, plot_data)
 
-    collected = frame > collecting_frames_range[1]
-    if frame in range(*collecting_frames_range):
-        for leg in hexapod.legs:
-            if leg.label not in leg_tips:
-                leg_tips[leg.label] = []
-            leg_tips[leg.label].append(leg.tibia_end.numpy())
-    elif collected and not plotted:
-        plotted = True
-        for leg in hexapod.legs:
-            points = np.array(leg_tips[leg.label])
-            cols = np.linspace(0,1,len(points))
+    for leg in hexapod.legs:
+        if leg.label not in leg_tips:
+            leg_tips[leg.label] = []
+        if len(leg_tips[leg.label]) > frames_to_collect:
+            leg_tips[leg.label].pop(0)
+        leg_tips[leg.label].append(leg.tibia_end.numpy())
 
-            segments = np.concatenate([points[:-1], points[1:]], axis=1)
-            segments = segments.reshape(-1, 2, 3)
-            segments = segments[::-1]
+        points = np.array(leg_tips[leg.label])
 
-            lc = Line3DCollection(segments, cmap='viridis')
-            lc.set_array(cols)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        segments = segments.reshape(-1, 2, 3)
+
+        if leg.label not in leg_tip_collections:
+            lc = Line3DCollection(segments, cmap='plasma')
+            leg_tip_collections[leg.label] = lc
+            lc.set_array(colors)
             lc.set_linewidth(2)
             line = ax.add_collection(lc)
-        ax.legend()
+        else:
+            lc = leg_tip_collections[leg.label]
+            lc.set_segments(segments)
 
     plt.show(block=False)
     plt.pause(0.001)
