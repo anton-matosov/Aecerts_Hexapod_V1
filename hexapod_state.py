@@ -12,7 +12,7 @@ from nrf import (
     hex_settings_data,
     rc_control_data,
 )
-from hexapod_initializations import a1, a2, detach_servos, servos_attached
+from hexapod_initializations import a1, a2, detach_servos
 
 # Standing Control Points Array
 SCPA = [[Vector3(0, 0, 0) for _ in range(10)] for _ in range(6)]
@@ -458,7 +458,7 @@ def sleep_state():
     g.current_state = State.SLEEP
 
     # Skip if servos are not attached - using the correct variable
-    if not servos_attached:
+    if not g.servos_attached:
         return
 
     # State 1: Move to sleep position

@@ -1,4 +1,5 @@
 from bezier import Vector3
+from globals import g
 
 # Pin definitions
 # Leg 0
@@ -138,14 +139,10 @@ control_points = [Vector3() for _ in range(10)]
 rotate_control_points = [Vector3() for _ in range(10)]
 attack_control_points = [Vector3() for _ in range(10)]
 
-servos_attached = False
-
 
 # AM - checked
 def attach_servos():
     """Attach all servos to their pins with specified pulse width range"""
-    global servos_attached
-
     try:
         coxa1.attach(coxa1_pin, 500, 2500)
         femur1.attach(femur1_pin, 500, 2500)
@@ -173,15 +170,13 @@ def attach_servos():
     except Exception as e:  # noqa: BLE001
         print(f'Error attaching servos: {e}')
 
-    servos_attached = True
+    g.servos_attached = True
     # print('Servos Attached')
 
 
 # AM - checked
 def detach_servos():
-    """Detach all servos"""
-    global servos_attached
-
+    """Detach all servos."""
     try:
         coxa1.detach()
         femur1.detach()
@@ -207,7 +202,7 @@ def detach_servos():
         femur6.detach()
         tibia6.detach()
 
-        servos_attached = False
+        g.servos_attached = False
     except Exception as e:  # noqa: BLE001
         print(f'Error detaching servos: {e}')
 

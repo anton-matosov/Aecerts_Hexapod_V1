@@ -20,7 +20,6 @@ from hexapod_initializations import (
     femur6,
     leg_length,
     rotate_sim_legs,
-    servos_attached,
     tibia1,
     tibia2,
     tibia3,
@@ -50,10 +49,10 @@ def set_cycle_start_points(leg=None):
 
 # AM - checked
 def rotate_to_angle(leg, target_rot):
-    global servos_attached
+    g.servos_attached
 
     rotate_sim_legs(leg, target_rot)
-    if not servos_attached:
+    if not g.servos_attached:
         attach_servos()
 
     if leg == 0:
@@ -84,15 +83,13 @@ def rotate_to_angle(leg, target_rot):
 
 # AM - checked
 def move_to_pos(leg, pos):
-    global hex_sensor_data, servos_attached, current_points, target_rot
-
     hex_sensor_data.foot_positions[leg].x = int(pos.x)
     hex_sensor_data.foot_positions[leg].y = int(pos.y)
 
-    if not servos_attached:
+    if not g.servos_attached:
         attach_servos()
 
-    current_points[leg] = pos
+    g.current_points[leg] = pos
 
     dis = Vector3(0, 0, 0).distance_to(pos)
     if dis > leg_length:
@@ -104,9 +101,9 @@ def move_to_pos(leg, pos):
     y = pos.y
     z = pos.z
 
-    o1 = offsets[leg].x
-    o2 = offsets[leg].y
-    o3 = offsets[leg].z
+    o1 = g.offsets[leg].x
+    o2 = g.offsets[leg].y
+    o3 = g.offsets[leg].z
 
     theta1 = math.atan2(y, x) * (180 / math.pi) + o1  # base angle
     l = math.sqrt(x * x + y * y)  # x and y extension

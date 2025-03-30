@@ -1,6 +1,6 @@
 # Python equivalent of NRF.h
 from bezier import Vector2
-from globals import PackageType, UNPRESSED, dynamic_stride_length
+from globals import PackageType, UNPRESSED, g
 
 
 # AM - checked
@@ -22,7 +22,7 @@ class RC_Control_Data_Package:
         self.pushButton2 = UNPRESSED
         self.idle = 0
         self.sleep = 0
-        self.dynamic_stride_length = dynamic_stride_length
+        self.dynamic_stride_length = g.dynamic_stride_length
 
         self.gait = 0
 

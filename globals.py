@@ -122,6 +122,11 @@ class GlobalState:
         self.target_sleep_position = Vector3(130, 0, -46)
         self.sleep_state_state = 1
 
+        # Attack state variables
+        self.slam_started = False
+
+        self.servo_attached = False
+
 
 # Create a singleton instance
 g = GlobalState()
