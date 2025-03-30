@@ -10,4 +10,8 @@ hexapod = HexapodModel()
 hexapod.forward_kinematics(0, 0, 90)
 fig, ax, plot_data = plot_hexapod(hexapod)
 
-plt.show()
+hexapod_main.setup()
+while True:
+    hexapod_main.loop()
+    plt.show(block=False)
+    plt.pause(0.01)

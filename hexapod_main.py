@@ -19,6 +19,7 @@ from globals import (
     State,
     current_state,
     attack_cooldown,
+    time_since_last_input,
 )
 
 from hexapod_attacks import slam_attack
