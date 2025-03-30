@@ -50,6 +50,8 @@ def setup_sim_legs(hexapod):
 
 
 def rotate_sim_leg(leg, target_rot):
+    return
+
     if sim_legs is None:
         return
 
@@ -63,13 +65,14 @@ def rotate_sim_leg(leg, target_rot):
 
 
 def move_sim_leg_to_pos(leg, target_pos):
-    return
+    # return
     if sim_legs is None:
         return
 
     sim_leg: LegModel = sim_legs[leg]
+    flip = sim_leg.label.startswith('right')
     x = target_pos.x
-    y = target_pos.y
+    y = -target_pos.y if flip else target_pos.y
     z = target_pos.z
     reached_target, alpha, beta, gamma = sim_leg.inverse_kinematics_local(Point3D([x, y, z]))
 
