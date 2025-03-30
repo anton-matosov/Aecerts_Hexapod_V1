@@ -9,6 +9,23 @@ from plotting import plot_hexapod, update_hexapod_plot
 import hexapod_main
 from nrf import rc_control_data, rc_settings_data
 
+# drqp_front_offset = 0.116924  # x offset for the front and back legs
+# drqp_side_offset = 0.063871  # y offset fo the front and back legs
+# drqp_middle_offset = 0.103  # x offset for the middle legs
+
+# drqp_coxa = 0.053
+# drqp_femur = 0.066225
+# drqp_tibia = 0.123
+
+# hexapod = HexapodModel(
+#     coxa_len=drqp_coxa * 1000,
+#     femur_len=drqp_femur * 1000,
+#     tibia_len=drqp_tibia * 1000,
+#     front_offset=drqp_front_offset * 1000,
+#     middle_offset=drqp_middle_offset * 1000,
+#     side_offset=drqp_side_offset * 1000,
+#     leg_rotation=[0, 0, g.leg_placement_angle],
+# )
 
 hexapod = HexapodModel(
     coxa_len=a1,
