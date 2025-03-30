@@ -48,7 +48,7 @@ class GlobalState:
 
         # Global variables
         self.connected = False
-        self.dynamic_stride_length = True
+        self.dynamic_stride_length = False
 
         self.gaits = [Gait.TRI, Gait.RIPPLE, Gait.WAVE, Gait.QUAD, Gait.BI, Gait.HOP]
 
