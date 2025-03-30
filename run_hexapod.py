@@ -8,7 +8,7 @@ from plotting import plot_hexapod, update_hexapod_plot
 
 import hexapod_main
 from nrf import rc_control_data
-from point import Point
+
 
 hexapod = HexapodModel(
     coxa_len=a1,
@@ -25,9 +25,8 @@ fig, ax, plot_data = plot_hexapod(hexapod)
 hexapod_main.setup()
 running = True
 while running:
+    rc_control_data.joy1_Button = PRESSED
     hexapod_main.loop()
-
-    rc_control_data.joy1_Button == PRESSED
     # rc_control_data.joy1_X = 127 + 70
     # rc_control_data.joy1_Y = 127 + 30
     # rc_control_data.joy2_X = 127 + 30
