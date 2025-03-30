@@ -38,8 +38,8 @@ frame = 0
 while plt.get_fignums(): # window(s) open
     g.current_type = PackageType.RC_CONTROL_DATA
     # rc_control_data.joy1_Button = PRESSED
-    # rc_control_data.joy1_X = 127 + 30 # forward
-    rc_control_data.joy1_Y = 127 + 30 # right
+    # rc_control_data.joy1_X = 127 + 30 # x>127 == right, x<127 == left
+    rc_control_data.joy1_Y = 127 - 30 # y>127 == backwards, y<127 == forwards
     # rc_control_data.joy2_X = 127 + 30
 
     # rc_control_data.joy2_Y = 127 + 30 # unused, causes crash if used without joy2_X

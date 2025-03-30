@@ -191,6 +191,7 @@ def get_gait_point(leg, push_fraction):
 
     t = g.t_array[leg]
 
+    # g.leg_placement_angle = 0 # With no rotation and forward movement, generated points were correct local points for right_front and left_back (y==0)
     # Propelling
     if t < push_fraction:
         if g.leg_states[leg] != LegState.PROPELLING:
@@ -212,22 +213,23 @@ def get_gait_point(leg, push_fraction):
             g.control_points_amount,
             map_float(t, 0, push_fraction, 0, 1),
         )
+        return straight_point
 
-        g.rotate_control_points[0] = g.cycle_start_points[leg]
-        g.rotate_control_points[1] = Vector3(g.distance_from_center + 40, 0, g.distance_from_ground)
-        g.rotate_control_points[2] = Vector3(
-            g.distance_from_center, rotate_stride_length, g.distance_from_ground
-        )
-        g.rotate_control_points_amount = 3
-        rotate_point = get_point_on_bezier_curve(
-            g.rotate_control_points[: g.rotate_control_points_amount],
-            g.rotate_control_points_amount,
-            map_float(t, 0, push_fraction, 0, 1),
-        )
+        # g.rotate_control_points[0] = g.cycle_start_points[leg]
+        # g.rotate_control_points[1] = Vector3(g.distance_from_center + 40, 0, g.distance_from_ground)
+        # g.rotate_control_points[2] = Vector3(
+        #     g.distance_from_center, rotate_stride_length, g.distance_from_ground
+        # )
+        # g.rotate_control_points_amount = 3
+        # rotate_point = get_point_on_bezier_curve(
+        #     g.rotate_control_points[: g.rotate_control_points_amount],
+        #     g.rotate_control_points_amount,
+        #     map_float(t, 0, push_fraction, 0, 1),
+        # )
 
-        return (
-            straight_point * abs(g.forward_amount) + rotate_point * abs(g.turn_amount)
-        ) / weight_sum
+        # return (
+        #     straight_point * abs(g.forward_amount) + rotate_point * abs(g.turn_amount)
+        # ) / weight_sum
 
     # Lifting
     else:

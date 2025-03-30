@@ -92,8 +92,6 @@ def process_control_data(data: RC_Control_Data_Package):
     if g.distance_from_ground >= 0:
         g.distance_from_ground = g.target_distance_from_ground
 
-    g.distance_from_center = 170
-
     # Smooth joystick movements
     g.joy1_current_vector = lerp(g.joy1_current_vector, g.joy1_target_vector, 0.08)
     g.joy1_current_magnitude = lerp(g.joy1_current_magnitude, g.joy1_target_magnitude, 0.08)

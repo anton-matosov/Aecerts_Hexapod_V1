@@ -91,7 +91,6 @@ class GlobalState:
         self.lift_height_multiplier = 1.0
         self.max_stride_length = 200
         self.max_speed = 100
-        self.leg_placement_angle = 56
 
         self.left_slider = 50
         self.global_speed_multiplier = 0.55
@@ -105,11 +104,12 @@ class GlobalState:
         self.cycle_progress = [0] * 6
         self.leg_states = [LegState.RESET] * 6
 
+        self.leg_placement_angle = 45
         self.stride_multiplier = [1, 1, 1, -1, -1, -1]
         self.rotation_multiplier = [-1, 0, 1, -1, 0, 1]
 
         self.distance_from_ground = -60
-        self.distance_from_center = 173
+        self.distance_from_center = 170 # Used in kinematics for the distance of trajectory from center
         self.lift_height = 130
         self.land_height = 70
         self.stride_overshoot = 10
