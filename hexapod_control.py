@@ -34,6 +34,7 @@ from globals import (
     constrain,
     offsets,
 )
+from nrf import hex_sensor_data
 
 
 # AM - checked

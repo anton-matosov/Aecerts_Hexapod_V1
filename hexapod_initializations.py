@@ -55,6 +55,19 @@ class Servo:
         # Placeholder for setting pulse width range
         self.pin = pin
 
+    def detach(self):
+        # Placeholder for detaching the servo
+        pass
+
+    def write_microseconds(self, microseconds):
+        # Placeholder for writing pulse width in microseconds
+        pass
+
+    @staticmethod
+    def __microseconds_to_angle(microseconds):
+        angle = ((microseconds - 500.0) / (2500.0 - 500.0)) * 180.0
+        return angle
+
 
 # AM - checked
 # Individual servo objects

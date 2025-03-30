@@ -1,5 +1,5 @@
 import time
-from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3, lerp
+from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3
 from globals import (
     control_points,
     current_gait,
@@ -27,7 +27,6 @@ from globals import (
     previous_gait,
     rotate_control_points,
     rotation_multiplier,
-    servos_attached,
     State,
     stride_length_multiplier,
     stride_multiplier,
@@ -37,12 +36,13 @@ from globals import (
     raw_offsets,
     connected,
 )
+from hexapod_control import move_to_pos, set_cycle_start_points
 from nrf import (
     rc_settings_data,
     hex_settings_data,
     rc_control_data,
 )
-from hexapod_initializations import a1, a2, detach_servos
+from hexapod_initializations import a1, a2, detach_servos, servos_attached
 
 # Standing Control Points Array
 SCPA = [[Vector3(0, 0, 0) for _ in range(10)] for _ in range(6)]
@@ -281,16 +281,6 @@ def get_gait_point(leg, push_fraction):
 
         # Return weighted average of straight and rotate points
         # ... (similar to the Arduino code)
-
-
-def set_cycle_start_points(leg):
-    cycle_start_points[leg] = current_points[leg]
-
-
-def move_to_pos(leg, position):
-    # This would be implemented to control the actual leg movement
-    current_points[leg] = position
-    pass
 
 
 # AM - checked

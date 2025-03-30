@@ -53,6 +53,12 @@ class Vector3:
     def __str__(self):
         return f'({self.x}, {self.y}, {self.z})'
 
+    def distance_to(self, other):
+        dx = other.x - self.x
+        dy = other.y - self.y
+        dz = other.z - self.z
+        return math.sqrt(dx**2 + dy**2 + dz**2)
+
 
 def binomial_coefficient(n, k):
     result = 1
