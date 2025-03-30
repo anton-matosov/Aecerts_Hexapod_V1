@@ -48,7 +48,28 @@ class Vector3:
         return self
 
     def __add__(self, other):
-        return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+        if isinstance(other, Vector3):
+            return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+        else:
+            return Vector3(self.x + other, self.y + other, self.z + other)
+
+    def __sub__(self, other):
+        if isinstance(other, Vector3):
+            return Vector3(self.x - other.x, self.y - other.y, self.z - other.z)
+        else:
+            return Vector3(self.x - other, self.y - other, self.z - other)
+
+    def __mul__(self, other):
+        if isinstance(other, Vector3):
+            return Vector3(self.x * other.x, self.y * other.y, self.z * other.z)
+        else:
+            return Vector3(self.x * other, self.y * other, self.z * other)
+
+    def __truediv__(self, other):
+        if isinstance(other, Vector3):
+            return Vector3(self.x / other.x, self.y / other.y, self.z / other.z)
+        else:
+            return Vector3(self.x / other, self.y / other, self.z / other)
 
     def __repr__(self):
         return f'({self.x}, {self.y}, {self.z})'

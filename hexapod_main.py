@@ -115,6 +115,7 @@ def process_control_data(data: RC_Control_Data_Package):
 
     # Smooth joystick movements
     joy1_current_vector = lerp_vector2(joy1_current_vector, joy1_target_vector, 0.08)
+    joy1_current_magnitude = lerp(joy1_current_magnitude, joy1_target_magnitude, 0.08)
 
     joy2_current_vector = lerp_vector2(joy2_current_vector, joy2_target_vector, 0.12)
     joy2_current_magnitude = lerp(joy2_current_magnitude, joy2_target_magnitude, 0.12)
