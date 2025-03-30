@@ -1,5 +1,7 @@
 from bezier import Vector3
 from globals import g
+from models import LegModel
+from point import Point3D
 
 # Pin definitions
 # Leg 0
@@ -32,7 +34,7 @@ coxa6_pin = 'right_back_coxa'  # 37
 femur6_pin = 'right_back_femur'  # 38
 tibia6_pin = 'right_back_tibia'  # 39
 
-sim_legs = None
+sim_legs: list[LegModel] = None
 
 
 def setup_sim_legs(hexapod):
@@ -47,11 +49,34 @@ def setup_sim_legs(hexapod):
     ]
 
 
-def rotate_sim_legs(leg, target_rot):
+def rotate_sim_leg(leg, target_rot):
     if sim_legs is None:
         return
-    # print(f'rotate_sim_legs: {leg=}, {target_rot=}')
-    sim_legs[leg].forward_kinematics(target_rot.x, target_rot.y - 140, target_rot.z)
+
+    # moved leg: sim_leg.label='right_back', target_pos=(160, 0, 0) alpha=0.0 beta=-128.53330597305725 gamma=153.5203255020375
+    # right_back_coxa angle=0.0 ms=500
+    # right_back_femur angle=128.53330597305725 ms=1928
+    # right_back_tibia angle=26.479674497962502 ms=794
+
+    sim_legs[leg].forward_kinematics(target_rot.x, -target_rot.y, target_rot.z)
+
+    foot = sim_legs[leg].tibia_end
+    foot_local = sim_legs[leg].to_local(foot)
+    print(f'rotated leg: {sim_legs[leg].label=}, {target_rot=} {foot=} {foot_local=}')
+
+
+def move_sim_leg_to_pos(leg, target_pos):
+    if sim_legs is None:
+        return
+
+    sim_leg: LegModel = sim_legs[leg]
+    x = target_pos.x
+    y = target_pos.y
+    z = target_pos.z
+    reached_target, alpha, beta, gamma = sim_leg.inverse_kinematics_local(Point3D([x, y, z]))
+
+    sim_leg.forward_kinematics(alpha, beta, gamma)
+    print(f'moved leg: {sim_leg.label=}, {target_pos=} {alpha=} {beta=} {gamma=}')
 
 
 # Hand crafted stub for Servo class
@@ -68,7 +93,9 @@ class Servo:
 
     def write_angle(self, angle):
         # Placeholder for writing angle in degrees
-        self.write_microseconds(self.__angle_to_microseconds(angle))
+        ms = self.__angle_to_microseconds(angle)
+        self.write_microseconds(ms)
+        print(f'{self.joint_name} {angle=} {ms=}')
 
     def write_microseconds(self, microseconds):
         # Placeholder for writing pulse width in microseconds

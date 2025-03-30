@@ -7,8 +7,16 @@ from plotting import plot_hexapod, update_hexapod_plot
 
 import hexapod_main
 from nrf import rc_control_data
+from point import Point
 
-hexapod = HexapodModel(coxa_len=a1, femur_len=a2, tibia_len=a3)
+hexapod = HexapodModel(
+    coxa_len=a1,
+    femur_len=a2,
+    tibia_len=a3,
+    front_offset=85,
+    middle_offset=100,
+    side_offset=55,
+)
 setup_sim_legs(hexapod)
 hexapod.forward_kinematics(0.0, 81.19264931247422, 137.66638455325148)
 fig, ax, plot_data = plot_hexapod(hexapod)
@@ -16,9 +24,9 @@ fig, ax, plot_data = plot_hexapod(hexapod)
 hexapod_main.setup()
 running = True
 while running:
-    hexapod_main.loop()
+    # hexapod_main.loop()
 
-    rc_control_data.joy1_X = 127 + 30
+    # rc_control_data.joy1_X = 127 + 70
     # rc_control_data.joy1_Y = 127 + 30
     # rc_control_data.joy2_X = 127 + 30
     # rc_control_data.joy2_Y = 127 + 30

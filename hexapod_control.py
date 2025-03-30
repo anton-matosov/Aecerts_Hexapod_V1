@@ -10,8 +10,6 @@ from hexapod_initializations import (
     coxa4,
     coxa5,
     coxa6,
-    current_points,
-    cycle_start_points,
     femur1,
     femur2,
     femur3,
@@ -19,7 +17,8 @@ from hexapod_initializations import (
     femur5,
     femur6,
     leg_length,
-    rotate_sim_legs,
+    move_sim_leg_to_pos,
+    rotate_sim_leg,
     tibia1,
     tibia2,
     tibia3,
@@ -51,7 +50,7 @@ def set_cycle_start_points(leg=None):
 def rotate_to_angle(leg, target_rot):
     g.servos_attached
 
-    rotate_sim_legs(leg, target_rot)
+    rotate_sim_leg(leg, target_rot)
     if not g.servos_attached:
         attach_servos()
 
@@ -86,6 +85,7 @@ def move_to_pos(leg, pos):
     hex_sensor_data.foot_positions[leg].x = int(pos.x)
     hex_sensor_data.foot_positions[leg].y = int(pos.y)
 
+    move_sim_leg_to_pos(leg, pos)
     if not g.servos_attached:
         attach_servos()
 
@@ -105,18 +105,17 @@ def move_to_pos(leg, pos):
     o2 = g.offsets[leg].y
     o3 = g.offsets[leg].z
 
-    theta1 = math.atan2(y, x) * (180 / math.pi) + o1  # base angle
+    theta1 = math.degrees(math.atan2(y, x)) + o1  # base angle
     l = math.sqrt(x * x + y * y)  # x and y extension
     l1 = l - a1
     h = math.sqrt(l1 * l1 + z * z)
 
     phi1 = math.acos(constrain((h**2 + a2**2 - a3**2) / (2 * h * a2), -1, 1))
     phi2 = math.atan2(z, l1)
-    theta2 = (phi1 + phi2) * 180 / math.pi + o2
+    theta2 = math.degrees(phi1 + phi2) + o2
     phi3 = math.acos(constrain((a2**2 + a3**2 - h**2) / (2 * a2 * a3), -1, 1))
-    theta3 = 180 - (phi3 * 180 / math.pi) + o3
+    theta3 = 180 - math.degrees(phi3) + o3
 
     target_rot = Vector3(theta1, theta2, theta3)
 
-    # TODO(AM): use rotateToAngle
     rotate_to_angle(leg, target_rot)

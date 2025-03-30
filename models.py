@@ -267,6 +267,10 @@ class LegModel:
 
     def inverse_kinematics(self, foot_target: Point3D, verbose=False):
         localized_foot_target = self.to_local(foot_target)
+        solvable, alpha, beta, gamma = self.inverse_kinematics_local(localized_foot_target, verbose)
+        return solvable, alpha, beta, gamma
+
+    def inverse_kinematics_local(self, localized_foot_target: Point3D, verbose=False):
         alpha, X_tick = self._inverse_kinematics_xy(localized_foot_target)
         solvable, beta, gamma = self._inverse_kinematics_xz(
             localized_foot_target.z,
