@@ -22,14 +22,7 @@ standing_start_points = [
     Vector3(0, 0, 0) for _ in range(6)
 ]  # points legs are at when entering standing state
 standing_in_between_points = [Vector3(0, 0, 0) for _ in range(6)]  # middle points of bezier curves
-standing_end_point = Vector3(0, 0, 0)
-current_legs = [-1, -1, -1]
-stand_loops = 0
-stand_progress = 0
-
-# Sleep state variables
-target_sleep_position = Vector3(130, 0, -46)
-sleep_state_state = 1
+g.standing_end_point = Vector3(0, 0, 0)
 
 
 def car_state():
@@ -175,8 +168,6 @@ def car_state():
 
 
 def get_gait_point(leg, push_fraction):
-    global control_points_amount, rotate_control_points_amount
-
     rotate_stride_length = g.joy2_current_vector.x * g.global_rotation_multiplier
     v = Vector2(g.joy1_current_vector.x, g.joy1_current_vector.y)
 
@@ -259,7 +250,7 @@ def lerp(
     Args:
         a: Starting value
         b: Ending value
-        f: Interpolation factor (0.0 to 1.0)
+        t: Interpolation factor (0.0 to 1.0)
 
     Returns:
         Interpolated value
@@ -279,35 +270,11 @@ def __lerp_float(a: float, b: float, t: float) -> float:
 
 # AM - checked
 def __lerp_vector2(a: Vector2, b: Vector2, f: float) -> Vector2:
-    """
-    Linear interpolation between two Vector2 objects.
-
-    Args:
-        a: Starting Vector2
-        b: Ending Vector2
-        f: Interpolation factor (0.0 to 1.0)
-
-    Returns:
-        Interpolated Vector2
-
-    """
     return Vector2(__lerp_float(a.x, b.x, f), __lerp_float(a.y, b.y, f))
 
 
 # AM - checked
 def __lerp_vector3(a: Vector3, b: Vector3, f: float) -> Vector3:
-    """
-    Linear interpolation between two Vector3 objects.
-
-    Args:
-        a: Starting Vector3
-        b: Ending Vector3
-        f: Interpolation factor (0.0 to 1.0)
-
-    Returns:
-        Interpolated Vector3
-
-    """
     return Vector3(__lerp_float(a.x, b.x, f), __lerp_float(a.y, b.y, f), __lerp_float(a.z, b.z, f))
 
 
@@ -361,8 +328,6 @@ def get_send_nrf_data():
 # AM - checked
 def standing_state():
     """Put the hexapod in a standing position."""
-    global stand_loops, stand_progress, standing_end_point, current_legs
-
     if g.current_state != State.STAND:
         print('Standing State')
 
@@ -370,10 +335,10 @@ def standing_state():
     high_lift = False
     set_cycle_start_points()
     # Use the standing_distance_adjustment variable here
-    standing_end_point = Vector3(
+    g.standing_end_point = Vector3(
         g.distance_from_center, 0, g.distance_from_ground + g.standing_distance_adjustment
     )
-    stand_loops = 2
+    g.stand_loops = 2
 
     # Set flags based on current state
     if (
@@ -390,8 +355,8 @@ def standing_state():
 
     if g.current_state != State.STAND:
         set_3_highest_leg()
-        stand_loops = 0
-        stand_progress = 0
+        g.stand_loops = 0
+        g.stand_progress = 0
 
         # Copy current points to standing start points
         for i in range(6):
@@ -404,11 +369,11 @@ def standing_state():
             in_between_point = Vector3(
                 standing_start_points[i].x, standing_start_points[i].y, standing_start_points[i].z
             )
-            in_between_point.x = (in_between_point.x + standing_end_point.x) / 1.5
-            in_between_point.y = (in_between_point.y + standing_end_point.y) / 1.5
+            in_between_point.x = (in_between_point.x + g.standing_end_point.x) / 1.5
+            in_between_point.y = (in_between_point.y + g.standing_end_point.y) / 1.5
 
-            in_between_point.z = (in_between_point.z + standing_end_point.z) / 2
-            if abs(in_between_point.z - standing_end_point.z) < 50:
+            in_between_point.z = (in_between_point.z + g.standing_end_point.z) / 2
+            if abs(in_between_point.z - g.standing_end_point.z) < 50:
                 in_between_point.z += 70
             if high_lift:
                 in_between_point.z += 80
@@ -417,20 +382,20 @@ def standing_state():
 
             SCPA[i][0] = standing_start_points[i]
             SCPA[i][1] = standing_in_between_points[i]
-            SCPA[i][2] = standing_end_point
+            SCPA[i][2] = g.standing_end_point
 
         for i in range(6):
             g.leg_states[i] = LegState.STANDING
 
     # Update distance from ground constantly
     for i in range(6):
-        SCPA[i][2] = standing_end_point
+        SCPA[i][2] = g.standing_end_point
 
     # Readjusting - takes about a second
-    while stand_loops < 2:
-        stand_progress += 20
+    while g.stand_loops < 2:
+        g.stand_progress += 20
 
-        t = float(stand_progress) / g.points
+        t = float(g.stand_progress) / g.points
         if t > 1:
             t = 1
 
@@ -438,19 +403,20 @@ def standing_state():
             for i in range(6):
                 move_to_pos(i, get_point_on_bezier_curve(SCPA[i][:3], 3, t))
 
-            if stand_progress > g.points:
-                stand_progress = 0
-                stand_loops = 2
+            if g.stand_progress > g.points:
+                g.stand_progress = 0
+                g.stand_loops = 2
         else:
             for i in range(3):
-                if current_legs[i] != -1:
+                if g.current_legs[i] != -1:
                     move_to_pos(
-                        current_legs[i], get_point_on_bezier_curve(SCPA[current_legs[i]][:3], 3, t)
+                        g.current_legs[i],
+                        get_point_on_bezier_curve(SCPA[g.current_legs[i]][:3], 3, t),
                     )
 
-            if stand_progress > g.points:
-                stand_progress = 0
-                stand_loops += 1
+            if g.stand_progress > g.points:
+                g.stand_progress = 0
+                g.stand_loops += 1
                 set_3_highest_leg()
 
     # Constantly move to the standing end position
@@ -460,35 +426,34 @@ def standing_state():
 
 def set_3_highest_leg():
     """Select the three legs with highest z-position to move first."""
-    global current_legs
-
-    current_legs[0] = -1
-    current_legs[1] = -1
-    current_legs[2] = -1
+    g.current_legs[0] = -1
+    g.current_legs[1] = -1
+    g.current_legs[2] = -1
 
     for j in range(3):
         for i in range(6):  # Go through the legs
             # If leg already on the list of current legs, skip it
-            if i in current_legs:
+            if i in g.current_legs:
                 continue
 
             # If leg already in position, don't add it
-            if g.current_points[i] == standing_end_point:
+            if g.current_points[i] == g.standing_end_point:
                 continue
 
             # If leg's z is greater than the leg already there, add it
-            if current_legs[j] == -1 or g.current_points[i].z > g.current_points[current_legs[j]].z:
-                current_legs[j] = i
+            if (
+                g.current_legs[j] == -1
+                or g.current_points[i].z > g.current_points[g.current_legs[j]].z
+            ):
+                g.current_legs[j] = i
 
 
 # AM - checked
 def sleep_state():
     """Put the hexapod in a sleep/powered down position."""
-    global sleep_state_state
-
     if g.current_state != State.SLEEP:
         print('Sleep State')
-        sleep_state_state = 1
+        g.sleep_state_state = 1
 
     g.current_state = State.SLEEP
 
@@ -496,24 +461,25 @@ def sleep_state():
     if not servos_attached:
         return
 
-    # State 1: Move legs to target sleep position
-    if sleep_state_state == 1:
+    # State 1: Move to sleep position
+    if g.sleep_state_state == 1:
         target_reached = True
+
         for i in range(6):
-            next_pos = lerp(g.current_points[i], target_sleep_position, 0.03)
+            next_pos = lerp(g.current_points[i], g.target_sleep_position, 0.03)
 
             # Snap to target when very close
-            if abs(g.current_points[i].x - target_sleep_position.x) < 1:
-                next_pos.x = target_sleep_position.x
-            if abs(g.current_points[i].y - target_sleep_position.y) < 1:
-                next_pos.y = target_sleep_position.y
-            if abs(g.current_points[i].z - target_sleep_position.z) < 1:
-                next_pos.z = target_sleep_position.z
+            if abs(g.current_points[i].x - g.target_sleep_position.x) < 1:
+                next_pos.x = g.target_sleep_position.x
+            if abs(g.current_points[i].y - g.target_sleep_position.y) < 1:
+                next_pos.y = g.target_sleep_position.y
+            if abs(g.current_points[i].z - g.target_sleep_position.z) < 1:
+                next_pos.z = g.target_sleep_position.z
 
             move_to_pos(i, next_pos)
 
             # Check if all legs have reached target
-            if g.current_points[i] != target_sleep_position:
+            if g.current_points[i] != g.target_sleep_position:
                 target_reached = False
 
         if target_reached:

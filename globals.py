@@ -114,6 +114,14 @@ class GlobalState:
         self.stride_overshoot = 10
         self.points = 1000
 
+        self.current_legs = [-1, -1, -1]
+        self.stand_loops = 0
+        self.stand_progress = 0
+
+        # Sleep state variables
+        self.target_sleep_position = Vector3(130, 0, -46)
+        self.sleep_state_state = 1
+
 
 # Create a singleton instance
 g = GlobalState()

@@ -20,6 +20,7 @@ from hexapod_state import (
     calibration_state,
     get_send_nrf_data,
     lerp,
+    save_offsets,
     sleep_state,
     standing_state,
     state_initialize,
@@ -59,13 +60,7 @@ def loop():
 
 # AM - checked
 def process_control_data(data: RC_Control_Data_Package):
-    global dynamic_stride_length, joy1_target_vector, joy1_target_magnitude
-    global joy2_target_vector, joy2_target_magnitude, target_distance_from_ground
-    global distance_from_ground, distance_from_center, joy1_current_vector
-    global joy1_current_magnitude, joy2_current_vector, joy2_current_magnitude
-    global previous_gait, current_gait, time_since_last_input, attack_cooldown, loop_start_time
-
-    dynamic_stride_length = data.dynamic_stride_length
+    g.dynamic_stride_length = data.dynamic_stride_length
 
     # Sleep mode
     if data.sleep == 1:
@@ -83,60 +78,59 @@ def process_control_data(data: RC_Control_Data_Package):
     joy2x = map_float(data.joy2_X, 0, 254, -100, 100)
     joy2y = map_float(data.joy2_Y, 0, 254, -100, 100)
 
-    joy1_target_vector = Vector2(joy1x, joy1y)
-    joy1_target_magnitude = constrain(math.hypot(joy1x, joy1y), 0, 100)
+    g.joy1_target_vector = Vector2(joy1x, joy1y)
+    g.joy1_target_magnitude = constrain(math.hypot(joy1x, joy1y), 0, 100)
 
-    joy2_target_vector = Vector2(joy2x, joy2y)
-    joy2_target_magnitude = constrain(math.hypot(joy2x, joy2y), 0, 100)
+    g.joy2_target_vector = Vector2(joy2x, joy2y)
+    g.joy2_target_magnitude = constrain(math.hypot(joy2x, joy2y), 0, 100)
 
     # Process height adjustment
-    target_distance_from_ground = distance_from_ground_base + (data.slider2 * -1.7)
-    distance_from_ground = lerp(distance_from_ground, target_distance_from_ground, 0.04)
-    if distance_from_ground >= 0:
-        distance_from_ground = target_distance_from_ground
+    g.target_distance_from_ground = g.distance_from_ground_base + (data.slider2 * -1.7)
+    g.distance_from_ground = lerp(g.distance_from_ground, g.target_distance_from_ground, 0.04)
+    if g.distance_from_ground >= 0:
+        g.distance_from_ground = g.target_distance_from_ground
 
-    distance_from_center = 170
+    g.distance_from_center = 170
 
     # Smooth joystick movements
-    joy1_current_vector = lerp(joy1_current_vector, joy1_target_vector, 0.08)
-    joy1_current_magnitude = lerp(joy1_current_magnitude, joy1_target_magnitude, 0.08)
+    g.joy1_current_vector = lerp(g.joy1_current_vector, g.joy1_target_vector, 0.08)
+    g.joy1_current_magnitude = lerp(g.joy1_current_magnitude, g.joy1_target_magnitude, 0.08)
 
-    joy2_current_vector = lerp(joy2_current_vector, joy2_target_vector, 0.12)
-    joy2_current_magnitude = lerp(joy2_current_magnitude, joy2_target_magnitude, 0.12)
+    g.joy2_current_vector = lerp(g.joy2_current_vector, g.joy2_target_vector, 0.12)
+    g.joy2_current_magnitude = lerp(g.joy2_current_magnitude, g.joy2_target_magnitude, 0.12)
 
-    previous_gait = current_gait
-    current_gait = data.gait
+    g.previous_gait = g.current_gait
+    g.current_gait = data.gait
 
     # Drive
-    if abs(joy1_current_magnitude) >= 10 or abs(joy2_current_magnitude) >= 10:
+    if abs(g.joy1_current_magnitude) >= 10 or abs(g.joy2_current_magnitude) >= 10:
         from hexapod_state import car_state
 
         car_state()
-        time_since_last_input = time.time() * 1000
+        g.time_since_last_input = time.time() * 1000
         return
 
     # Idle from hexapod
-    if abs(time_since_last_input - time.time() * 1000) > 5:
+    if abs(g.time_since_last_input - time.time() * 1000) > 5:
         standing_state()
         return
 
     # Attack
-    if data.joy1_Button == PRESSED and attack_cooldown == 0:
+    if data.joy1_Button == PRESSED and g.attack_cooldown == 0:
         print('slam attack')
         reset_movement_vectors()
         slam_attack()
         standing_state()
-        attack_cooldown = 50
-        loop_start_time = time.time() * 1000
+        g.attack_cooldown = 50
+        g.loop_start_time = time.time() * 1000
         return
     else:
-        attack_cooldown = max(attack_cooldown - elapsed_time, 0)
+        g.attack_cooldown = max(g.attack_cooldown - g.elapsed_time, 0)
 
 
 # AM - checked
 def process_settings_data(data):
-    global send_type, current_state
-    send_type = (
+    g.current_type = (
         PackageType.HEXAPOD_SETTINGS_DATA
     )  # when settings data is being processed, always send settings data back
 
@@ -145,7 +139,7 @@ def process_settings_data(data):
         return
 
     # finished calibrating, save offsets
-    if current_state == State.CALIBRATE:
+    if g.current_state == State.CALIBRATE:
         save_offsets()
 
     sleep_state()
@@ -153,33 +147,29 @@ def process_settings_data(data):
 
 # AM - checked
 def reset_movement_vectors():
-    global joy1_current_vector, joy1_current_magnitude, joy2_current_vector, joy2_current_magnitude
+    g.joy1_current_vector = Vector2(0, 0)
+    g.joy1_current_magnitude = 0
 
-    joy1_current_vector = Vector2(0, 0)
-    joy1_current_magnitude = 0
-
-    joy2_current_vector = Vector2(0, 0)
-    joy2_current_magnitude = 0
+    g.joy2_current_vector = Vector2(0, 0)
+    g.joy2_current_magnitude = 0
 
 
 # AM - checked
 # This is a better implementation made by AI
 def load_raw_offsets_from_eeprom():
     """Load servo calibration offsets from persistent storage."""
-    global raw_offsets
-
     print('Loading calibration data...')
     try:
         # In Python, you might use a file or database instead of EEPROM
         with open('servo_offsets.txt', 'r') as f:
             for i, line in enumerate(f):
                 if i < 18:  # 18 servos
-                    raw_offsets[i] = float(line.strip())
+                    g.raw_offsets[i] = float(line.strip())
     except FileNotFoundError:
         print('No calibration data found, using defaults')
-        raw_offsets = [0] * 18
+        g.raw_offsets = [0] * 18
 
 
 # AM - checked
 def print_connected_status():
-    print(f'Connected: {"TRUE" if connected else "FALSE"}')
+    print(f'Connected: {"TRUE" if g.connected else "FALSE"}')
