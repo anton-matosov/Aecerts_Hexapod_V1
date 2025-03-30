@@ -1,5 +1,5 @@
 import time
-from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3
+from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3, lerp
 from globals import (
     control_points,
     current_gait,
@@ -22,10 +22,12 @@ from globals import (
     leg_states,
     LegState,
     max_stride_length,
+    offsets,
     points,
     previous_gait,
     rotate_control_points,
     rotation_multiplier,
+    servos_attached,
     State,
     stride_length_multiplier,
     stride_multiplier,
@@ -40,7 +42,25 @@ from nrf import (
     hex_settings_data,
     rc_control_data,
 )
-from hexapod_initializations import a1, a2
+from hexapod_initializations import a1, a2, detach_servos
+
+# Standing Control Points Array
+SCPA = [[Vector3(0, 0, 0) for _ in range(10)] for _ in range(6)]
+
+# Standing state variables
+standing_start_points = [
+    Vector3(0, 0, 0) for _ in range(6)
+]  # points legs are at when entering standing state
+standing_in_between_points = [Vector3(0, 0, 0) for _ in range(6)]  # middle points of bezier curves
+standing_end_point = Vector3(0, 0, 0)
+current_legs = [-1, -1, -1]
+stand_loops = 0
+stand_progress = 0
+standing_distance_adjustment = 0  # Adjustment for standing height
+
+# Sleep state variables
+target_sleep_position = Vector3(130, 0, -46)
+sleep_state_state = 1
 
 
 def car_state():
@@ -374,26 +394,6 @@ def get_send_nrf_data():
 
 
 # AM - checked
-# Standing Control Points Array
-SCPA = [[Vector3(0, 0, 0) for _ in range(10)] for _ in range(6)]
-
-
-# AM - checked
-standing_start_points = [
-    Vector3(0, 0, 0) for _ in range(6)
-]  # points legs are at when entering standing state
-standing_in_between_points = [Vector3(0, 0, 0) for _ in range(6)]  # middle points of bezier curves
-standing_end_point = Vector3(0, 0, 0)
-
-# AM - checked
-current_legs = [-1, -1, -1]
-stand_loops = 0
-stand_progress = 0
-
-standing_distance_adjustment = 0  # Adjustment for standing height
-
-
-# AM - checked
 def standing_state():
     """Put the hexapod in a standing position."""
     global current_state, stand_loops, stand_progress, standing_end_point, current_legs
@@ -516,22 +516,48 @@ def set_3_highest_leg():
                 current_legs[j] = i
 
 
+# AM - checked
 def sleep_state():
     """Put the hexapod in a sleep/powered down position."""
-    global current_state
+    global current_state, sleep_state_state
 
     if current_state != State.SLEEP:
         print('Sleep State')
-        current_state = State.SLEEP
+        sleep_state_state = 1
 
-    # Move all legs to a resting position
-    # This typically involves lowering the body to the ground
-    # and positioning the legs in a way that minimizes servo load
+    current_state = State.SLEEP
 
-    # Example (pseudocode):
-    # for leg in range(6):
-    #     position = calculate_sleep_position(leg)
-    #     move_to_pos(leg, position)
+    # Skip if servos are not attached - using the correct variable
+    if not servos_attached:
+        return
+
+    # State 1: Move legs to target sleep position
+    if sleep_state_state == 1:
+        target_reached = True
+        for i in range(6):
+            next_pos = lerp(current_points[i], target_sleep_position, 0.03)
+
+            # Snap to target when very close
+            if abs(current_points[i].x - target_sleep_position.x) < 1:
+                next_pos.x = target_sleep_position.x
+            if abs(current_points[i].y - target_sleep_position.y) < 1:
+                next_pos.y = target_sleep_position.y
+            if abs(current_points[i].z - target_sleep_position.z) < 1:
+                next_pos.z = target_sleep_position.z
+
+            move_to_pos(i, next_pos)
+
+            # Check if all legs have reached target
+            if current_points[i] != target_sleep_position:
+                target_reached = False
+
+        if target_reached:
+            sleep_state_state = 2
+
+    # State 2: Detach servos to save power
+    elif sleep_state_state == 2:
+        detach_servos()
+        sleep_state_state = 3
 
 
 def calibration_state():
