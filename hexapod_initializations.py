@@ -73,6 +73,7 @@ def move_sim_leg_to_pos(leg, target_pos):
     flip = sim_leg.label.startswith('right')
     x = target_pos.x
     y = -target_pos.y if flip else target_pos.y
+    # y = target_pos.y
     z = target_pos.z
     reached_target, alpha, beta, gamma = sim_leg.inverse_kinematics_local(Point3D([x, y, z]))
 
