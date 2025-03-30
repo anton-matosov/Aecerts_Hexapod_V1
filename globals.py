@@ -50,7 +50,6 @@ class GlobalState:
         self.connected = False
         self.dynamic_stride_length = True
 
-        self.total_gaits = 6
         self.gaits = [Gait.TRI, Gait.RIPPLE, Gait.WAVE, Gait.QUAD, Gait.BI, Gait.HOP]
 
         self.raw_offsets = [0] * 18
@@ -60,7 +59,6 @@ class GlobalState:
         self.current_state = State.INITIALIZE
         self.current_gait = Gait.TRI
         self.previous_gait = Gait.TRI
-        self.current_gait_id = 0
 
         self.standing_distance_adjustment = 0
         self.distance_from_ground_base = -60

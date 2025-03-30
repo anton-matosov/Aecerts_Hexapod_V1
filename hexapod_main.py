@@ -4,6 +4,7 @@ import time
 from bezier import constrain, map_float, Vector2
 from globals import (
     PRESSED,
+    Gait,
     g,
     PackageType,
     State,
@@ -101,7 +102,7 @@ def process_control_data(data: RC_Control_Data_Package):
     g.joy2_current_magnitude = lerp(g.joy2_current_magnitude, g.joy2_target_magnitude, 0.12)
 
     g.previous_gait = g.current_gait
-    g.current_gait = data.gait
+    g.current_gait = Gait(data.gait)
 
     # Drive
     if abs(g.joy1_current_magnitude) >= 10 or abs(g.joy2_current_magnitude) >= 10:

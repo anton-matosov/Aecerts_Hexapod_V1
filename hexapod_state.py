@@ -42,110 +42,110 @@ def car_state():
         for i in range(6):
             g.leg_states[i] = LegState.RESET
 
-    if g.current_gait == Gait.TRI:
-        g.cycle_progress[0] = 0
-        g.cycle_progress[1] = g.points / 2
-        g.cycle_progress[2] = 0
-        g.cycle_progress[3] = g.points / 2
-        g.cycle_progress[4] = 0
-        g.cycle_progress[5] = g.points / 2
+        if g.current_gait == Gait.TRI:
+            g.cycle_progress[0] = 0
+            g.cycle_progress[1] = g.points / 2
+            g.cycle_progress[2] = 0
+            g.cycle_progress[3] = g.points / 2
+            g.cycle_progress[4] = 0
+            g.cycle_progress[5] = g.points / 2
 
-        g.push_fraction = 3.1 / 6.0
-        g.speed_multiplier = 1
-        g.stride_length_multiplier = 1.2
-        g.lift_height_multiplier = 1.1
-        g.max_stride_length = 240
-        g.max_speed = 200
+            g.push_fraction = 3.1 / 6.0
+            g.speed_multiplier = 1
+            g.stride_length_multiplier = 1.2
+            g.lift_height_multiplier = 1.1
+            g.max_stride_length = 240
+            g.max_speed = 200
 
-    elif g.current_gait == Gait.WAVE:
-        # Offsets
-        g.cycle_progress[0] = 0
-        g.cycle_progress[1] = g.points / 6
-        g.cycle_progress[2] = (g.points / 6) * 2
-        g.cycle_progress[3] = (g.points / 6) * 5
-        g.cycle_progress[4] = (g.points / 6) * 4
-        g.cycle_progress[5] = (g.points / 6) * 3
+        elif g.current_gait == Gait.WAVE:
+            # Offsets
+            g.cycle_progress[0] = 0
+            g.cycle_progress[1] = g.points / 6
+            g.cycle_progress[2] = (g.points / 6) * 2
+            g.cycle_progress[3] = (g.points / 6) * 5
+            g.cycle_progress[4] = (g.points / 6) * 4
+            g.cycle_progress[5] = (g.points / 6) * 3
 
-        # Percentage Time On Ground
-        g.push_fraction = 4.9 / 6.0
+            # Percentage Time On Ground
+            g.push_fraction = 4.9 / 6.0
 
-        g.speed_multiplier = 0.40
-        g.stride_length_multiplier = 2
-        g.lift_height_multiplier = 1.2
-        g.max_stride_length = 150
-        g.max_speed = 160
+            g.speed_multiplier = 0.40
+            g.stride_length_multiplier = 2
+            g.lift_height_multiplier = 1.2
+            g.max_stride_length = 150
+            g.max_speed = 160
 
-    elif g.current_gait == Gait.RIPPLE:
-        # Offsets
-        g.cycle_progress[0] = 0
-        g.cycle_progress[1] = (g.points / 6) * 4
-        g.cycle_progress[2] = (g.points / 6) * 2
-        g.cycle_progress[3] = (g.points / 6) * 5
-        g.cycle_progress[4] = g.points / 6
-        g.cycle_progress[5] = (g.points / 6) * 3
+        elif g.current_gait == Gait.RIPPLE:
+            # Offsets
+            g.cycle_progress[0] = 0
+            g.cycle_progress[1] = (g.points / 6) * 4
+            g.cycle_progress[2] = (g.points / 6) * 2
+            g.cycle_progress[3] = (g.points / 6) * 5
+            g.cycle_progress[4] = g.points / 6
+            g.cycle_progress[5] = (g.points / 6) * 3
 
-        # Percentage Time On Ground
-        g.push_fraction = 3.2 / 6.0
+            # Percentage Time On Ground
+            g.push_fraction = 3.2 / 6.0
 
-        g.speed_multiplier = 1
-        g.stride_length_multiplier = 1.3
-        g.lift_height_multiplier = 1.1
-        g.max_stride_length = 220
-        g.max_speed = 200
+            g.speed_multiplier = 1
+            g.stride_length_multiplier = 1.3
+            g.lift_height_multiplier = 1.1
+            g.max_stride_length = 220
+            g.max_speed = 200
 
-    elif g.current_gait == Gait.BI:
-        # Offsets
-        g.cycle_progress[0] = 0
-        g.cycle_progress[1] = g.points / 3
-        g.cycle_progress[2] = (g.points / 3) * 2
-        g.cycle_progress[3] = 0
-        g.cycle_progress[4] = g.points / 3
-        g.cycle_progress[5] = (g.points / 3) * 2
+        elif g.current_gait == Gait.BI:
+            # Offsets
+            g.cycle_progress[0] = 0
+            g.cycle_progress[1] = g.points / 3
+            g.cycle_progress[2] = (g.points / 3) * 2
+            g.cycle_progress[3] = 0
+            g.cycle_progress[4] = g.points / 3
+            g.cycle_progress[5] = (g.points / 3) * 2
 
-        # Percentage Time On Ground
-        g.push_fraction = 2.1 / 6.0
+            # Percentage Time On Ground
+            g.push_fraction = 2.1 / 6.0
 
-        g.speed_multiplier = 4
-        g.stride_length_multiplier = 1
-        g.lift_height_multiplier = 1.8
-        g.max_stride_length = 230
-        g.max_speed = 130
+            g.speed_multiplier = 4
+            g.stride_length_multiplier = 1
+            g.lift_height_multiplier = 1.8
+            g.max_stride_length = 230
+            g.max_speed = 130
 
-    elif g.current_gait == Gait.QUAD:
-        # Offsets
-        g.cycle_progress[0] = 0
-        g.cycle_progress[1] = g.points / 3
-        g.cycle_progress[2] = (g.points / 3) * 2
-        g.cycle_progress[3] = 0
-        g.cycle_progress[4] = g.points / 3
-        g.cycle_progress[5] = (g.points / 3) * 2
+        elif g.current_gait == Gait.QUAD:
+            # Offsets
+            g.cycle_progress[0] = 0
+            g.cycle_progress[1] = g.points / 3
+            g.cycle_progress[2] = (g.points / 3) * 2
+            g.cycle_progress[3] = 0
+            g.cycle_progress[4] = g.points / 3
+            g.cycle_progress[5] = (g.points / 3) * 2
 
-        # Percentage Time On Ground
-        g.push_fraction = 4.1 / 6.0
+            # Percentage Time On Ground
+            g.push_fraction = 4.1 / 6.0
 
-        g.speed_multiplier = 1
-        g.stride_length_multiplier = 1.2
-        g.lift_height_multiplier = 1.1
-        g.max_stride_length = 220
-        g.max_speed = 200
+            g.speed_multiplier = 1
+            g.stride_length_multiplier = 1.2
+            g.lift_height_multiplier = 1.1
+            g.max_stride_length = 220
+            g.max_speed = 200
 
-    elif g.current_gait == Gait.HOP:
-        # Offsets
-        g.cycle_progress[0] = 0
-        g.cycle_progress[1] = 0
-        g.cycle_progress[2] = 0
-        g.cycle_progress[3] = 0
-        g.cycle_progress[4] = 0
-        g.cycle_progress[5] = 0
+        elif g.current_gait == Gait.HOP:
+            # Offsets
+            g.cycle_progress[0] = 0
+            g.cycle_progress[1] = 0
+            g.cycle_progress[2] = 0
+            g.cycle_progress[3] = 0
+            g.cycle_progress[4] = 0
+            g.cycle_progress[5] = 0
 
-        # Percentage Time On Ground
-        g.push_fraction = 3 / 6.0
+            # Percentage Time On Ground
+            g.push_fraction = 3 / 6.0
 
-        g.speed_multiplier = 1
-        g.stride_length_multiplier = 1.6
-        g.lift_height_multiplier = 2.5
-        g.max_stride_length = 240
-        g.max_speed = 200
+            g.speed_multiplier = 1
+            g.stride_length_multiplier = 1.6
+            g.lift_height_multiplier = 2.5
+            g.max_stride_length = 240
+            g.max_speed = 200
 
     for i in range(6):
         g.t_array[i] = float(g.cycle_progress[i]) / g.points

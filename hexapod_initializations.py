@@ -78,11 +78,10 @@ def move_sim_leg_to_pos(leg, target_pos):
     reached_target, alpha, beta, gamma = sim_leg.inverse_kinematics_local(Point3D([x, y, z]))
 
     sim_leg.forward_kinematics(alpha, beta, gamma)
-    # print(f'movplt.sleeped leg: {sim_leg.label=}, {target_pos=} {alpha=} {beta=} {gamma=}')
+    # print(f'moved leg: {sim_leg.label=}, {target_pos=} {alpha=} {beta=} {gamma=}')
 
 
 # Hand crafted stub for Servo class
-# TODO(AM): Implement the servo class to pass in the hexapod sim
 class Servo:
     def attach(self, joint_name, min_pulse, max_pulse):
         self.joint_name = joint_name
