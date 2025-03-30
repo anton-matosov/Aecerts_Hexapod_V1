@@ -24,8 +24,9 @@ while running:
     # rc_control_data.joy2_Y = 127 + 30
     update_hexapod_plot(hexapod, plot_data)
 
-    ax.relim()
-    ax.autoscale_view()
-    fig.canvas.draw()
-    fig.canvas.flush_events()
-    plt.pause(0.01)
+    # ax.relim()
+    # ax.autoscale_view()
+    # fig.canvas.draw()
+    # fig.canvas.flush_events()
+    plt.show(block=False)
+    plt.pause(0.001)

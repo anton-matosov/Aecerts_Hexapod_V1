@@ -169,7 +169,7 @@ def car_state():
 
 def get_gait_point(leg, push_fraction):
     rotate_stride_length = g.joy2_current_vector.x * g.global_rotation_multiplier
-    v = Vector2(g.joy1_current_vector.x, g.joy1_current_vector.y)
+    v = g.joy1_current_vector.copy()
 
     if not g.dynamic_stride_length:
         v.normalize()
@@ -186,6 +186,7 @@ def get_gait_point(leg, push_fraction):
             rotate_stride_length = 70
 
     weight_sum = abs(g.forward_amount) + abs(g.turn_amount)
+
     t = g.t_array[leg]
 
     # Propelling
@@ -203,7 +204,6 @@ def get_gait_point(leg, push_fraction):
             g.leg_placement_angle * g.rotation_multiplier[leg], Vector2(g.distance_from_center, 0)
         )
         g.control_points_amount = 2
-
         straight_point = get_point_on_bezier_curve(
             g.control_points[: g.control_points_amount],
             g.control_points_amount,
@@ -216,7 +216,6 @@ def get_gait_point(leg, push_fraction):
             g.distance_from_center, rotate_stride_length, g.distance_from_ground
         )
         g.rotate_control_points_amount = 3
-
         rotate_point = get_point_on_bezier_curve(
             g.rotate_control_points[: g.rotate_control_points_amount],
             g.rotate_control_points_amount,
@@ -233,11 +232,58 @@ def get_gait_point(leg, push_fraction):
             set_cycle_start_points(leg)
         g.leg_states[leg] = LegState.LIFTING
 
-        # Set control points for lifting phase
-        # ... (similar to the Arduino code)
+        g.control_points[0] = g.cycle_start_points[leg]
+        g.control_points[1] = g.cycle_start_points[leg] + Vector3(
+            0, 0, g.lift_height * g.lift_height_multiplier
+        )
+        g.control_points[2] = Vector3(
+            -v.x * g.stride_multiplier[leg] + g.distance_from_center,
+            (v.y + g.stride_overshoot) * g.stride_multiplier[leg],
+            g.distance_from_ground + g.land_height,
+        ).rotate(
+            g.leg_placement_angle * g.rotation_multiplier[leg], Vector2(g.distance_from_center, 0)
+        )
+        g.control_points[3] = Vector3(
+            -v.x * g.stride_multiplier[leg] + g.distance_from_center,
+            v.y * g.stride_multiplier[leg],
+            g.distance_from_ground,
+        ).rotate(
+            g.leg_placement_angle * g.rotation_multiplier[leg], Vector2(g.distance_from_center, 0)
+        )
+        g.control_points_amount = 4
+        straight_point = get_point_on_bezier_curve(
+            g.control_points[: g.control_points_amount],
+            g.control_points_amount,
+            map_float(t, push_fraction, 1, 0, 1),
+        )
 
-        # Return weighted average of straight and rotate points
-        # ... (similar to the Arduino code)
+        g.rotate_control_points[0] = g.cycle_start_points[leg]
+        g.rotate_control_points[1] = g.cycle_start_points[leg] + Vector3(
+            0, 0, g.lift_height * g.lift_height_multiplier
+        )
+        g.rotate_control_points[2] = Vector3(
+            g.distance_from_center + 40,
+            0,
+            g.distance_from_ground + g.lift_height * g.lift_height_multiplier,
+        )
+        g.rotate_control_points[3] = Vector3(
+            g.distance_from_center,
+            -(rotate_stride_length + g.stride_overshoot),
+            g.distance_from_ground + g.land_height,
+        )
+        g.rotate_control_points[4] = Vector3(
+            g.distance_from_center, -rotate_stride_length, g.distance_from_ground
+        )
+        g.rotate_control_points_amount = 5
+        rotate_point = get_point_on_bezier_curve(
+            g.rotate_control_points[: g.rotate_control_points_amount],
+            g.rotate_control_points_amount,
+            map_float(t, push_fraction, 1, 0, 1),
+        )
+
+        return (
+            straight_point * abs(g.forward_amount) + rotate_point * abs(g.turn_amount)
+        ) / weight_sum
 
 
 # AM - checked
@@ -287,7 +333,7 @@ def state_initialize():
     move_to_pos(4, Vector3(160, 0, 0))
     move_to_pos(5, Vector3(160, 0, 0))
 
-    time.sleep(25 / 1000)
+    # time.sleep(25 / 1000)
 
     move_to_pos(0, Vector3(225, 0, 115))
     move_to_pos(1, Vector3(225, 0, 115))
@@ -296,7 +342,7 @@ def state_initialize():
     move_to_pos(4, Vector3(225, 0, 115))
     move_to_pos(5, Vector3(225, 0, 115))
 
-    time.sleep(50 / 1000)
+    # time.sleep(50 / 1000)
 
 
 # AM - checked, stub

@@ -19,8 +19,11 @@ class Vector2:
         else:
             return Vector2(self.x * other, self.y * other)
 
-    def __str__(self):
+    def __repr__(self):
         return f'({self.x}, {self.y})'
+
+    def copy(self):
+        return Vector2(self.x, self.y)
 
 
 class Vector3:
@@ -79,6 +82,9 @@ class Vector3:
         dy = other.y - self.y
         dz = other.z - self.z
         return math.sqrt(dx**2 + dy**2 + dz**2)
+
+    def copy(self):
+        return Vector3(self.x, self.y, self.z)
 
 
 def binomial_coefficient(n, k):

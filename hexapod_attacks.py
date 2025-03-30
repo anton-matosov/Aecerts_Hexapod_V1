@@ -39,7 +39,7 @@ def slam_attack():
         if t >= 0.5 and not g.slam_started:
             g.slam_started = True
 
-    time.sleep(0.1)
+    # time.sleep(0.1)
     set_cycle_start_points()
 
 
