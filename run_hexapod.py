@@ -22,7 +22,7 @@ setup_sim_legs(hexapod)
 hexapod.forward_kinematics(0.0, 81.19264931247422, 137.66638455325148)
 fig, ax, plot_data = plot_hexapod(hexapod)
 
-rc_control_data.gait = Gait.WAVE
+rc_control_data.gait = Gait.QUAD
 hexapod_main.setup()
 running = True
 while running:
