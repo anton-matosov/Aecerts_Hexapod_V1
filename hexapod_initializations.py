@@ -50,6 +50,8 @@ def setup_sim_legs(hexapod):
 
 
 def rotate_sim_leg(leg, target_rot):
+    return
+
     if sim_legs is None:
         return
 
@@ -62,7 +64,7 @@ def rotate_sim_leg(leg, target_rot):
 
     foot = sim_legs[leg].tibia_end
     foot_local = sim_legs[leg].to_local(foot)
-    print(f'rotated leg: {sim_legs[leg].label=}, {target_rot=} {foot=} {foot_local=}')
+    # print(f'rotaplt.sleepted leg: {sim_legs[leg].label=}, {target_rot=} {foot=} {foot_local=}')
 
 
 def move_sim_leg_to_pos(leg, target_pos):
@@ -76,7 +78,7 @@ def move_sim_leg_to_pos(leg, target_pos):
     reached_target, alpha, beta, gamma = sim_leg.inverse_kinematics_local(Point3D([x, y, z]))
 
     sim_leg.forward_kinematics(alpha, beta, gamma)
-    print(f'moved leg: {sim_leg.label=}, {target_pos=} {alpha=} {beta=} {gamma=}')
+    # print(f'movplt.sleeped leg: {sim_leg.label=}, {target_pos=} {alpha=} {beta=} {gamma=}')
 
 
 # Hand crafted stub for Servo class
@@ -95,7 +97,7 @@ class Servo:
         # Placeholder for writing angle in degrees
         ms = self.__angle_to_microseconds(angle)
         self.write_microseconds(ms)
-        print(f'{self.joint_name} {angle=} {ms=}')
+        # print(f'{self.joint_name} {angle=} {ms=}')
 
     def write_microseconds(self, microseconds):
         # Placeholder for writing pulse width in microseconds

@@ -1,4 +1,6 @@
 import time
+
+from matplotlib import pyplot as plt
 from bezier import Vector2, Vector3, get_point_on_bezier_curve, map_float
 from globals import State, g
 from hexapod_control import move_to_pos, set_cycle_start_points
@@ -39,7 +41,7 @@ def slam_attack():
         if t >= 0.5 and not g.slam_started:
             g.slam_started = True
 
-    # time.sleep(0.1)
+    plt.pause(0.1)
     set_cycle_start_points()
 
 

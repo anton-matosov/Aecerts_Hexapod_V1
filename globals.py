@@ -1,3 +1,4 @@
+import time
 from bezier import Vector2, Vector3, get_point_on_bezier_curve, map_float, constrain
 from enum import Enum
 
@@ -75,7 +76,7 @@ class GlobalState:
         self.joy2_current_vector = Vector2(0, 0)
         self.joy2_current_magnitude = 0
 
-        self.time_since_last_input = 0
+        self.time_of_last_input = time.time()
         self.attack_cooldown = 0
         self.elapsed_time = 0
         self.loop_start_time = 0
@@ -130,3 +131,7 @@ class GlobalState:
 
 # Create a singleton instance
 g = GlobalState()
+
+
+def milliseconds():
+    return int(time.time() * 1000)

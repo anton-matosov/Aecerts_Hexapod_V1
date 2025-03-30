@@ -1,6 +1,7 @@
 #!./.venv/bin/python
 
 from matplotlib import pyplot as plt
+from globals import PRESSED
 from hexapod_initializations import setup_sim_legs, a1, a2, a3
 from models import HexapodModel
 from plotting import plot_hexapod, update_hexapod_plot
@@ -24,8 +25,9 @@ fig, ax, plot_data = plot_hexapod(hexapod)
 hexapod_main.setup()
 running = True
 while running:
-    # hexapod_main.loop()
+    hexapod_main.loop()
 
+    rc_control_data.joy1_Button == PRESSED
     # rc_control_data.joy1_X = 127 + 70
     # rc_control_data.joy1_Y = 127 + 30
     # rc_control_data.joy2_X = 127 + 30

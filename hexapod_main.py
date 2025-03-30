@@ -7,6 +7,7 @@ from globals import (
     g,
     PackageType,
     State,
+    milliseconds,
 )
 
 from hexapod_attacks import slam_attack
@@ -42,8 +43,8 @@ def setup():
 
 # AM - checked
 def loop():
-    g.elapsed_time = time.time() * 1000 - g.loop_start_time
-    g.loop_start_time = time.time() * 1000
+    g.elapsed_time = milliseconds() - g.loop_start_time
+    g.loop_start_time = milliseconds()
 
     g.connected = get_send_nrf_data()
 
@@ -107,11 +108,12 @@ def process_control_data(data: RC_Control_Data_Package):
         from hexapod_state import car_state
 
         car_state()
-        g.time_since_last_input = time.time() * 1000
+        g.time_of_last_input = milliseconds()
         return
 
     # Idle from hexapod
-    if abs(g.time_since_last_input - time.time() * 1000) > 5:
+    if abs(g.time_of_last_input - milliseconds()) > 5:
+        g.time_of_last_input = milliseconds()  # AM - added
         standing_state()
         return
 
@@ -122,7 +124,7 @@ def process_control_data(data: RC_Control_Data_Package):
         slam_attack()
         standing_state()
         g.attack_cooldown = 50
-        g.loop_start_time = time.time() * 1000
+        g.loop_start_time = milliseconds()
         return
     else:
         g.attack_cooldown = max(g.attack_cooldown - g.elapsed_time, 0)

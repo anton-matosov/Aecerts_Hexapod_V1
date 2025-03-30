@@ -1,4 +1,6 @@
 import time
+
+from matplotlib import pyplot as plt
 from bezier import constrain, get_point_on_bezier_curve, map_float, Vector2, Vector3
 from globals import (
     g,
@@ -333,7 +335,7 @@ def state_initialize():
     move_to_pos(4, Vector3(160, 0, 0))
     move_to_pos(5, Vector3(160, 0, 0))
 
-    # time.sleep(25 / 1000)
+    plt.pause(25 / 1000)
 
     move_to_pos(0, Vector3(225, 0, 115))
     move_to_pos(1, Vector3(225, 0, 115))
@@ -342,7 +344,8 @@ def state_initialize():
     move_to_pos(4, Vector3(225, 0, 115))
     move_to_pos(5, Vector3(225, 0, 115))
 
-    # time.sleep(50 / 1000)
+    plt.pause(50 / 1000)
+    pass
 
 
 # AM - checked, stub
