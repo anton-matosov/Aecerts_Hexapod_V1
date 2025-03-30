@@ -1,0 +1,11 @@
+#!./.venv/bin/python
+
+from matplotlib import pyplot as plt
+from models import HexapodModel
+from plotting import plot_hexapod
+
+hexapod = HexapodModel()
+hexapod.forward_kinematics(0, 0, 90)
+fig, ax, plot_data = plot_hexapod(hexapod)
+
+plt.show()
