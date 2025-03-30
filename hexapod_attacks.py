@@ -3,12 +3,11 @@ from bezier import Vector2, Vector3, get_point_on_bezier_curve, map_float
 from globals import (
     State,
     control_points,
-    current_state,
     cycle_start_points,
     rotation_multiplier,
     stride_multiplier,
 )
-from hexapod_main import move_to_pos, set_cycle_start_points
+from hexapod_control import move_to_pos, set_cycle_start_points
 from nrf import rc_control_data
 
 slam_started = False
