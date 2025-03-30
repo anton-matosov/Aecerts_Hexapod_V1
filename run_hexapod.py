@@ -5,6 +5,8 @@ from globals import PRESSED, Gait
 from hexapod_initializations import setup_sim_legs, a1, a2, a3
 from models import HexapodModel
 from plotting import plot_hexapod, update_hexapod_plot
+import numpy as np
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import hexapod_main
 from nrf import rc_control_data
@@ -26,7 +28,7 @@ rc_control_data.gait = Gait.TRI
 hexapod_main.setup()
 
 leg_tips = {}
-collecting_frames_range = (50, 200)
+collecting_frames_range = (50, 130)
 plotted = False
 collected = False
 
@@ -51,7 +53,18 @@ while plt.get_fignums(): # window(s) open
     elif collected and not plotted:
         plotted = True
         for leg in hexapod.legs:
-            ax.plot(*zip(*leg_tips[leg.label]), label=leg.label)
+            points = np.array(leg_tips[leg.label])
+            cols = np.linspace(0,1,len(points))
+
+            segments = np.concatenate([points[:-1], points[1:]], axis=1)
+            segments = segments.reshape(-1, 2, 3)
+            segments = segments[::-1]
+
+            lc = Line3DCollection(segments, cmap='viridis')
+            lc.set_array(cols)
+            lc.set_linewidth(2)
+            line = ax.add_collection(lc)
+        ax.legend()
 
     plt.show(block=False)
     plt.pause(0.001)
