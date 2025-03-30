@@ -1,29 +1,35 @@
 from bezier import Vector3
 
 # Pin definitions
-coxa1_pin = 22
-femur1_pin = 23
-tibia1_pin = 24
+# Leg 0
+coxa1_pin = 'left_back_coxa'  # 22
+femur1_pin = 'left_back_femur'  # 23
+tibia1_pin = 'left_back_tibia'  # 24
 
-coxa2_pin = 25
-femur2_pin = 26
-tibia2_pin = 27
+# Leg 1
+coxa2_pin = 'left_middle_coxa'  # 25
+femur2_pin = 'left_middle_femur'  # 26
+tibia2_pin = 'left_middle_tibia'  # 27
 
-coxa3_pin = 28
-femur3_pin = 29
-tibia3_pin = 30
+# Leg 2
+coxa3_pin = 'left_front_coxa'  # 28
+femur3_pin = 'left_front_femur'  # 29
+tibia3_pin = 'left_front_tibia'  # 30
 
-coxa4_pin = 31
-femur4_pin = 32
-tibia4_pin = 33
+# Leg 3
+coxa4_pin = 'right_front_coxa'  # 31
+femur4_pin = 'right_front_femur'  # 32
+tibia4_pin = 'right_front_tibia'  # 33
 
-coxa5_pin = 34
-femur5_pin = 35
-tibia5_pin = 36
+# Leg 4
+coxa5_pin = 'right_middle_coxa'  # 34
+femur5_pin = 'right_middle_femur'  # 35
+tibia5_pin = 'right_middle_tibia'  # 36
 
-coxa6_pin = 37
-femur6_pin = 38
-tibia6_pin = 39
+# Leg 5
+coxa6_pin = 'right_back_coxa'  # 37
+femur6_pin = 'right_back_femur'  # 38
+tibia6_pin = 'right_back_tibia'  # 39
 
 # Servo pin mapping
 servo_pins = [
@@ -51,21 +57,29 @@ servo_pins = [
 # Hand crafted stub for Servo class
 # TODO(AM): Implement the servo class to pass in the hexapod sim
 class Servo:
-    def attach(self, pin, min_pulse, max_pulse):
-        # Placeholder for setting pulse width range
-        self.pin = pin
+    def attach(self, joint_name, min_pulse, max_pulse):
+        self.joint_name = joint_name
+        self.min_pulse = min_pulse
+        self.max_pulse = max_pulse
 
     def detach(self):
         # Placeholder for detaching the servo
         pass
 
+    def write_angle(self, angle):
+        # Placeholder for writing angle in degrees
+        self.write_microseconds(self.__angle_to_microseconds(angle))
+
     def write_microseconds(self, microseconds):
         # Placeholder for writing pulse width in microseconds
         pass
 
-    @staticmethod
-    def __microseconds_to_angle(microseconds):
-        angle = ((microseconds - 500.0) / (2500.0 - 500.0)) * 180.0
+    def __angle_to_microseconds(self, angle):
+        val = self.min_pulse + (((self.max_pulse - self.min_pulse) / 180.0) * angle)
+        return int(val)
+
+    def __microseconds_to_angle(self, microseconds):
+        angle = ((microseconds - self.min_pulse) / (self.max_pulse - self.min_pulse)) * 180.0
         return angle
 
 

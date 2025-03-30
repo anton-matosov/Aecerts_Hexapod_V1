@@ -50,46 +50,36 @@ def set_cycle_start_points(leg=None):
 
 
 # AM - checked
-def angle_to_microseconds(angle):
-    val = 500.0 + (((2500.0 - 500.0) / 180.0) * angle)
-    return int(val)
-
-
-# AM - checked
 def rotate_to_angle(leg, target_rot):
     global servos_attached
 
     if not servos_attached:
         attach_servos()
 
-    coxa_microseconds = angle_to_microseconds(target_rot.x)
-    femur_microseconds = angle_to_microseconds(target_rot.y)
-    tibia_microseconds = angle_to_microseconds(target_rot.z)
-
     if leg == 0:
-        coxa1.write_microseconds(coxa_microseconds)
-        femur1.write_microseconds(femur_microseconds)
-        tibia1.write_microseconds(tibia_microseconds)
+        coxa1.write_angle(target_rot.x)
+        femur1.write_angle(target_rot.y)
+        tibia1.write_angle(target_rot.z)
     elif leg == 1:
-        coxa2.write_microseconds(coxa_microseconds)
-        femur2.write_microseconds(femur_microseconds)
-        tibia2.write_microseconds(tibia_microseconds)
+        coxa2.write_angle(target_rot.x)
+        femur2.write_angle(target_rot.y)
+        tibia2.write_angle(target_rot.z)
     elif leg == 2:
-        coxa3.write_microseconds(coxa_microseconds)
-        femur3.write_microseconds(femur_microseconds)
-        tibia3.write_microseconds(tibia_microseconds)
+        coxa3.write_angle(target_rot.x)
+        femur3.write_angle(target_rot.y)
+        tibia3.write_angle(target_rot.z)
     elif leg == 3:
-        coxa4.write_microseconds(coxa_microseconds)
-        femur4.write_microseconds(femur_microseconds)
-        tibia4.write_microseconds(tibia_microseconds)
+        coxa4.write_angle(target_rot.x)
+        femur4.write_angle(target_rot.y)
+        tibia4.write_angle(target_rot.z)
     elif leg == 4:
-        coxa5.write_microseconds(coxa_microseconds)
-        femur5.write_microseconds(femur_microseconds)
-        tibia5.write_microseconds(tibia_microseconds)
+        coxa5.write_angle(target_rot.x)
+        femur5.write_angle(target_rot.y)
+        tibia5.write_angle(target_rot.z)
     elif leg == 5:
-        coxa6.write_microseconds(coxa_microseconds)
-        femur6.write_microseconds(femur_microseconds)
-        tibia6.write_microseconds(tibia_microseconds)
+        coxa6.write_angle(target_rot.x)
+        femur6.write_angle(target_rot.y)
+        tibia6.write_angle(target_rot.z)
 
 
 # AM - checked
@@ -132,31 +122,4 @@ def move_to_pos(leg, pos):
     target_rot = Vector3(theta1, theta2, theta3)
 
     # TODO(AM): use rotateToAngle
-    coxa_microseconds = angle_to_microseconds(target_rot.x)
-    femur_microseconds = angle_to_microseconds(target_rot.y)
-    tibia_microseconds = angle_to_microseconds(target_rot.z)
-
-    if leg == 0:
-        coxa1.write_microseconds(coxa_microseconds)
-        femur1.write_microseconds(femur_microseconds)
-        tibia1.write_microseconds(tibia_microseconds)
-    elif leg == 1:
-        coxa2.write_microseconds(coxa_microseconds)
-        femur2.write_microseconds(femur_microseconds)
-        tibia2.write_microseconds(tibia_microseconds)
-    elif leg == 2:
-        coxa3.write_microseconds(coxa_microseconds)
-        femur3.write_microseconds(femur_microseconds)
-        tibia3.write_microseconds(tibia_microseconds)
-    elif leg == 3:
-        coxa4.write_microseconds(coxa_microseconds)
-        femur4.write_microseconds(femur_microseconds)
-        tibia4.write_microseconds(tibia_microseconds)
-    elif leg == 4:
-        coxa5.write_microseconds(coxa_microseconds)
-        femur5.write_microseconds(femur_microseconds)
-        tibia5.write_microseconds(tibia_microseconds)
-    elif leg == 5:
-        coxa6.write_microseconds(coxa_microseconds)
-        femur6.write_microseconds(femur_microseconds)
-        tibia6.write_microseconds(tibia_microseconds)
+    rotate_to_angle(leg, target_rot)
