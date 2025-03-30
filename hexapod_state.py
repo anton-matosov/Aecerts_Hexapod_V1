@@ -202,12 +202,13 @@ def get_gait_point(leg, push_fraction):
             v.x * g.stride_multiplier[leg] + g.distance_from_center,
             -v.y * g.stride_multiplier[leg],
             g.distance_from_ground,
-        ).rotate(
+        )
+        g.control_points[1].rotate(
             g.leg_placement_angle * g.rotation_multiplier[leg], Vector2(g.distance_from_center, 0)
         )
         g.control_points_amount = 2
         straight_point = get_point_on_bezier_curve(
-            g.control_points[: g.control_points_amount],
+            g.control_points,
             g.control_points_amount,
             map_float(t, 0, push_fraction, 0, 1),
         )
@@ -242,19 +243,21 @@ def get_gait_point(leg, push_fraction):
             -v.x * g.stride_multiplier[leg] + g.distance_from_center,
             (v.y + g.stride_overshoot) * g.stride_multiplier[leg],
             g.distance_from_ground + g.land_height,
-        ).rotate(
+        )
+        g.control_points[2].rotate(
             g.leg_placement_angle * g.rotation_multiplier[leg], Vector2(g.distance_from_center, 0)
         )
         g.control_points[3] = Vector3(
             -v.x * g.stride_multiplier[leg] + g.distance_from_center,
             v.y * g.stride_multiplier[leg],
             g.distance_from_ground,
-        ).rotate(
+        )
+        g.control_points[3].rotate(
             g.leg_placement_angle * g.rotation_multiplier[leg], Vector2(g.distance_from_center, 0)
         )
         g.control_points_amount = 4
         straight_point = get_point_on_bezier_curve(
-            g.control_points[: g.control_points_amount],
+            g.control_points,
             g.control_points_amount,
             map_float(t, push_fraction, 1, 0, 1),
         )
