@@ -104,8 +104,10 @@ class GlobalState:
         self.current_points = [Vector3() for _ in range(6)]
         self.cycle_progress = [0] * 6
         self.leg_states = [LegState.RESET] * 6
-        self.stride_multiplier = [1.0] * 6
-        self.rotation_multiplier = [1.0] * 6
+
+        self.stride_multiplier = [1, 1, 1, -1, -1, -1]
+        self.rotation_multiplier = [-1, 0, 1, -1, 0, 1]
+
         self.distance_from_ground = -60
         self.distance_from_center = 173
         self.lift_height = 130

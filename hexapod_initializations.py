@@ -70,10 +70,10 @@ def move_sim_leg_to_pos(leg, target_pos):
         return
 
     sim_leg: LegModel = sim_legs[leg]
-    flip = sim_leg.label.startswith('right')
     x = target_pos.x
-    y = -target_pos.y if flip else target_pos.y
-    # y = target_pos.y
+    # flip = sim_leg.label.startswith('right')
+    # y = -target_pos.y if flip else target_pos.y
+    y = target_pos.y
     z = target_pos.z
     reached_target, alpha, beta, gamma = sim_leg.inverse_kinematics_local(Point3D([x, y, z]))
 
@@ -144,29 +144,6 @@ a1 = 46.0  # Coxa Length
 a2 = 108.0  # Femur Length
 a3 = 200.0  # Tibia Length
 leg_length = a1 + a2 + a3
-
-
-# AM - checked
-# Position tracking
-current_points = [Vector3() for _ in range(6)]
-cycle_start_points = [Vector3() for _ in range(6)]
-
-
-# AM - checked
-current_rot = Vector3(180, 0, 180)
-target_rot = Vector3(180, 0, 180)
-
-
-# AM - checked
-stride_multiplier = [1, 1, 1, -1, -1, -1]
-rotation_multiplier = [-1, 0, 1, -1, 0, 1]
-
-
-# AM - checked
-control_points = [Vector3() for _ in range(10)]
-rotate_control_points = [Vector3() for _ in range(10)]
-attack_control_points = [Vector3() for _ in range(10)]
-
 
 # AM - checked
 def attach_servos():
