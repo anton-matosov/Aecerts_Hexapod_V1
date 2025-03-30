@@ -19,6 +19,7 @@ from hexapod_initializations import (
     femur5,
     femur6,
     leg_length,
+    rotate_sim_legs,
     servos_attached,
     tibia1,
     tibia2,
@@ -53,6 +54,7 @@ def set_cycle_start_points(leg=None):
 def rotate_to_angle(leg, target_rot):
     global servos_attached
 
+    rotate_sim_legs(leg, target_rot)
     if not servos_attached:
         attach_servos()
 

@@ -31,27 +31,26 @@ coxa6_pin = 'right_back_coxa'  # 37
 femur6_pin = 'right_back_femur'  # 38
 tibia6_pin = 'right_back_tibia'  # 39
 
-# Servo pin mapping
-servo_pins = [
-    coxa1_pin,
-    femur1_pin,
-    tibia1_pin,
-    coxa2_pin,
-    femur2_pin,
-    tibia2_pin,
-    coxa3_pin,
-    femur3_pin,
-    tibia3_pin,
-    coxa4_pin,
-    femur4_pin,
-    tibia4_pin,
-    coxa5_pin,
-    femur5_pin,
-    tibia5_pin,
-    coxa6_pin,
-    femur6_pin,
-    tibia6_pin,
-]
+sim_legs = None
+
+
+def setup_sim_legs(hexapod):
+    global sim_legs
+    sim_legs = [
+        hexapod.left_back,
+        hexapod.left_middle,
+        hexapod.left_front,
+        hexapod.right_front,
+        hexapod.right_middle,
+        hexapod.right_back,
+    ]
+
+
+def rotate_sim_legs(leg, target_rot):
+    if sim_legs is None:
+        return
+    # print(f'rotate_sim_legs: {leg=}, {target_rot=}')
+    sim_legs[leg].forward_kinematics(target_rot.x, target_rot.y - 140, target_rot.z)
 
 
 # Hand crafted stub for Servo class
@@ -175,7 +174,7 @@ def attach_servos():
         print(f'Error attaching servos: {e}')
 
     servos_attached = True
-    print('Servos Attached')
+    # print('Servos Attached')
 
 
 # AM - checked
@@ -212,4 +211,4 @@ def detach_servos():
     except Exception as e:  # noqa: BLE001
         print(f'Error detaching servos: {e}')
 
-    print('Servos Detached')
+    # print('Servos Detached')
