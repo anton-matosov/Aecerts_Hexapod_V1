@@ -38,7 +38,7 @@ class Vector3:
 
         # Translate point to origin
         translated_x = self.x - pivot.x
-        translated_y = self.y
+        translated_y = self.y - pivot.y
 
         # Rotate point
         rotated_x = translated_x * math.cos(angle_rad) - translated_y * math.sin(angle_rad)
@@ -46,7 +46,7 @@ class Vector3:
 
         # Translate point back
         self.x = rotated_x + pivot.x
-        self.y = rotated_y
+        self.y = rotated_y + pivot.y
 
         return self
 
