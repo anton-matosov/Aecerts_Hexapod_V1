@@ -111,7 +111,7 @@ def process_control_data(data: RC_Control_Data_Package):
         return
 
     # Idle from hexapod
-    if abs(g.time_of_last_input - milliseconds()) > 5:
+    if abs(g.time_of_last_input - milliseconds()) > 500:
         g.time_of_last_input = milliseconds()  # AM - added
         standing_state()
         return

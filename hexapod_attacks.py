@@ -26,6 +26,8 @@ def slam_attack():
         move_to_pos(4, get_foot_placement_path_point(4, t))
         move_to_pos(5, get_foot_placement_path_point(5, t))
 
+        g.process_frame()
+
     set_cycle_start_points()
 
     frames = attack_speed * 1.2
@@ -41,7 +43,9 @@ def slam_attack():
         if t >= 0.5 and not g.slam_started:
             g.slam_started = True
 
-    plt.pause(0.1)
+        g.process_frame()
+
+    g.process_frame(0.1)
     set_cycle_start_points()
 
 

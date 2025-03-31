@@ -128,6 +128,7 @@ class GlobalState:
 
         self.servo_attached = False
 
+        self.process_frame = lambda delta_time: None
 
 # Create a singleton instance
 g = GlobalState()

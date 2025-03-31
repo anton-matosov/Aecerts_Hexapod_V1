@@ -51,25 +51,21 @@ hexapod_main.setup()
 g.current_type = PackageType.RC_CONTROL_DATA
 hexapod_main.loop()
 
-fig, ax, plot_data = plot_hexapod(hexapod, feet_trails_frames=60)
+fig, ax, plot_data = plot_hexapod(hexapod, feet_trails_frames=30)
 
-frame = 0
-while plt.get_fignums(): # window(s) open
-    g.current_type = PackageType.RC_CONTROL_DATA
-    #
-    # rc_control_data.joy1_Button = PRESSED
-    # rc_control_data.joy1_X = 127 + 30 # x>127 == right, x<127 == left
-    # rc_control_data.joy1_Y = 127 - 30 # y>127 == backwards, y<127 == forwards
-    # rc_control_data.joy2_X = 127 + 30
-
-    # rc_control_data.joy2_Y = 127 + 30 # unused, causes crash if used without joy2_X
-
-    ps5_controller.update(rc_control_data)
-    hexapod_main.loop()
+def process_frame(delta_time = 0.001):
     update_hexapod_plot(hexapod, plot_data)
 
     plt.show(block=False)
-    plt.pause(0.001)
-    frame += 1
+    plt.pause(delta_time)
+
+g.process_frame = process_frame
+
+while plt.get_fignums(): # window(s) open
+    g.current_type = PackageType.RC_CONTROL_DATA
+
+    ps5_controller.update(rc_control_data)
+    hexapod_main.loop()
+    g.process_frame(0.001)
 
 ps5_controller.close()
