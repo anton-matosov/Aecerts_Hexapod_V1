@@ -212,6 +212,9 @@ def get_gait_point(leg, push_fraction):
             g.control_points,
             g.control_points_amount,
             map_float(t, 0, push_fraction, 0, 1),
+            leg=leg,
+            phase='straight',
+            state='push',
         )
 
         g.rotate_control_points[0] = g.cycle_start_points[leg]
@@ -224,6 +227,9 @@ def get_gait_point(leg, push_fraction):
             g.rotate_control_points[: g.rotate_control_points_amount],
             g.rotate_control_points_amount,
             map_float(t, 0, push_fraction, 0, 1),
+            leg=leg,
+            phase='rotate',
+            state='push',
         )
 
         return (
@@ -261,6 +267,10 @@ def get_gait_point(leg, push_fraction):
             g.control_points,
             g.control_points_amount,
             map_float(t, push_fraction, 1, 0, 1),
+
+            leg=leg,
+            phase='straight',
+            state='lift',
         )
 
         g.rotate_control_points[0] = g.cycle_start_points[leg]
@@ -285,6 +295,9 @@ def get_gait_point(leg, push_fraction):
             g.rotate_control_points[: g.rotate_control_points_amount],
             g.rotate_control_points_amount,
             map_float(t, push_fraction, 1, 0, 1),
+            leg=leg,
+            phase='rotate',
+            state='lift',
         )
 
         return (

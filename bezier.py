@@ -98,8 +98,15 @@ def binomial_coefficient(n, k):
 
     return result
 
+on_get_point_on_bezier_curve: callable = None
 
-def get_point_on_bezier_curve(points, num_points, t):
+def set_on_get_point_on_bezier_curve(callback: callable):
+    global on_get_point_on_bezier_curve
+    on_get_point_on_bezier_curve = callback
+
+
+def get_point_on_bezier_curve(points, num_points, t, **kwargs):
+
     if isinstance(points[0], Vector2):
         pos = Vector2()
 
@@ -112,7 +119,6 @@ def get_point_on_bezier_curve(points, num_points, t):
             pos.x += b * points[i].x
             pos.y += b * points[i].y
 
-        return pos
     elif isinstance(points[0], Vector3):
         pos = Vector3()
 
@@ -125,11 +131,12 @@ def get_point_on_bezier_curve(points, num_points, t):
             pos.x += b * points[i].x
             pos.y += b * points[i].y
             pos.z += b * points[i].z
-
-        return pos
     else:
         raise TypeError('Points must be Vector2 or Vector3 objects')
 
+    if on_get_point_on_bezier_curve:
+        on_get_point_on_bezier_curve(points[0:num_points], t, result=pos, **kwargs)
+    return pos
 
 # Helper functions from Car_State.ino
 def map_float(x, in_min, in_max, out_min, out_max):
